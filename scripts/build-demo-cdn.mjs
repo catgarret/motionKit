@@ -18,7 +18,9 @@ const version = pkg.version;
 const SRC = path.join(root, 'demo');
 const OUT = path.join(root, 'site');
 
-const cdnBase = `https://cdn.jsdelivr.net/npm/@dong-gri/kineto@${version}/dist`;
+// Always resolve to the newest published build (@latest) rather than pinning an
+// exact version — a pinned number 404s if that version was never published.
+const cdnBase = `https://cdn.jsdelivr.net/npm/@dong-gri/kineto@latest/dist`;
 
 // 1. Fresh copy of the whole demo tree (html, js, css, assets…).
 fs.rmSync(OUT, { recursive: true, force: true });
