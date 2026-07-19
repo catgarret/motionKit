@@ -7,6 +7,8 @@ Kineto follows Semantic Versioning. Public scope is additionally governed by `FE
 - **New `lazy` effect — `crt`**: old CRT / cathode-ray TV power-on. A bright line snaps open, the picture expands vertically out of it with an overexposed bloom, then settles behind a faint scanline overlay. Added to the demo and the playground effect list.
 - **Lightbox mobile toolbar**: on narrow screens the centered `1 / N` counter overlapped the zoom/close controls — it now drops into flow so the counter sits left and the controls right (no overlap); zoom/close buttons are square.
 - **Demo mobile fixes**: lightbox thumbnail grid no longer overlaps (robust 2-column, square thumbnails); the ripple sample is more visible (higher opacity) so the effect reads on touch.
+- **Tooling — CDN demo generator**: `npm run demo:cdn` (also part of `npm run build`) regenerates a deploy-ready `site/` copy of the demo with the Kineto script/style pinned to the exact CDN version — no more hand-editing the public demo on every update, and no stale-cache surprises. `site/` is git-ignored (build output).
+- **README**: added an "AI vibe-coding" credit line to the footer of all seven language READMEs.
 
 ## [0.8.4]
 

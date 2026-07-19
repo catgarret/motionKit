@@ -164,4 +164,4 @@ npm run verify  # lint・build・テスト・コントラクト検証
 
 ## ライセンス
 
-MIT © [dongri](https://dongri.me)
+MIT © [dongri](https://dongri.me) · AI バイブコーディングで作りました。

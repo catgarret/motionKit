@@ -190,4 +190,4 @@ npm run verify  # lint · build · 테스트 · 계약 검증
 
 ## 라이선스
 
-MIT © [dongri](https://dongri.me)
+MIT © [dongri](https://dongri.me) · AI 바이브코딩으로 만들었습니다.

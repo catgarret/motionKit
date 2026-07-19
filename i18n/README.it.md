@@ -164,4 +164,4 @@ npm run verify  # lint, build, test, controlli del contratto
 
 ## Licenza
 
-MIT © [dongri](https://dongri.me)
+MIT © [dongri](https://dongri.me) · Realizzato con AI vibe-coding.
