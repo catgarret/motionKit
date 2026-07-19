@@ -2,9 +2,12 @@
 
 Kineto follows Semantic Versioning. Public scope is additionally governed by `FEATURE_CONTRACT.md`.
 
-## [0.8.9]
+## [0.8.10]
 
 - **Fix — iOS gyroscope (tilt + compass)**: motion effects stopped working on iOS because the DeviceOrientation permission was requested per-element from `pointerdown`, which recent WebKit no longer treats as a valid user-activation for the permission prompt. There is now one shared permission gate triggered by the first `click`/`touchend` anywhere on the page, so a single tap unlocks the gyroscope for every tilt and compass element at once.
+
+## [0.8.9]
+
 - **Counter (slot) — direction follows the count**: a decreasing counter (e.g. a 34,000 → 10,000 discount) now rolls its digits downward (new digits drop in from above), while an increasing counter still rolls upward. Previously every reel scrolled up regardless of direction.
 - **Demo — narrow-phone responsiveness**: the card grid drops to a single fluid column below 560px (the old `minmax(330px,…)` forced horizontal overflow that clipped cards and the overflow-text bar on iPhone-width screens), the overflow-text bar is now fluid, and the settings drawer gets a dedicated ≤480px layout (single-column controls, tighter gutters, wrapping header actions).
 
