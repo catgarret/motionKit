@@ -47,17 +47,29 @@ export function ensureGyroPermission() {
   if (typeof DeviceOrientationEvent.requestPermission !== 'function') return Promise.resolve(true);
   if (gyroPermissionPromise) return gyroPermissionPromise;
   gyroPermissionPromise = new Promise((resolve) => {
-    const ask = async () => {
-      try { resolve((await DeviceOrientationEvent.requestPermission()) === 'granted'); }
-      catch (_error) { resolve(false); }
+    let settled = false;
+    const cleanup = () => {
+      document.removeEventListener('click', onGesture, true);
+      document.removeEventListener('touchend', onGesture, true);
     };
-    const onGesture = () => {
-      document.removeEventListener('click', onGesture);
-      document.removeEventListener('touchend', onGesture);
-      ask();
+    const finish = (value) => { if (settled) return; settled = true; cleanup(); resolve(value); };
+    const onGesture = async () => {
+      try {
+        const result = await DeviceOrientationEvent.requestPermission();
+        if (result === 'granted') finish(true);
+        else if (result === 'denied') finish(false);
+        // any other result: keep listening for a valid tap
+      } catch (_error) {
+        // requestPermission() throws when it isn't called from a genuine user
+        // activation — e.g. a tap that became a scroll. Keep the listeners so the
+        // NEXT real tap can raise the prompt instead of giving up after one try.
+      }
     };
-    document.addEventListener('click', onGesture);
-    document.addEventListener('touchend', onGesture);
+    // `click` only fires on real taps (never on scroll), so it is the reliable
+    // activation for iOS's motion-permission prompt; `touchend` is a fast path.
+    // Capture phase so a child's stopPropagation can't swallow the gesture.
+    document.addEventListener('click', onGesture, true);
+    document.addEventListener('touchend', onGesture, true);
   });
   return gyroPermissionPromise;
 }
