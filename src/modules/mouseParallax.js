@@ -1,4 +1,4 @@
-import { clamp, env, lerp, snapshotInlineStyles } from '../utils.js';
+import { clamp, ensureGyroPermission, env, lerp, snapshotInlineStyles } from '../utils.js';
 
 export default {
   create(el, opts) {
@@ -25,7 +25,6 @@ export default {
         if (event.alpha == null) return;
         target = -event.alpha * sensitivity;
       };
-      let gyroPermission = null;
       const onMove = (event) => {
         const rect = el.getBoundingClientRect();
         if (!rect.width || !rect.height) return;
@@ -54,18 +53,9 @@ export default {
         rafId = requestAnimationFrame(tick);
       };
       if (useGyro) {
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-          gyroPermission = async () => {
-            try {
-              if (await DeviceOrientationEvent.requestPermission() === 'granted') {
-                window.addEventListener('deviceorientation', onGyroCompass, { passive: true });
-              }
-            } catch (_error) { /* requires a user gesture; may be denied */ }
-          };
-          eventTarget.addEventListener('pointerdown', gyroPermission, { once: true });
-        } else {
-          window.addEventListener('deviceorientation', onGyroCompass, { passive: true });
-        }
+        ensureGyroPermission().then((granted) => {
+          if (granted && alive) window.addEventListener('deviceorientation', onGyroCompass, { passive: true });
+        });
       } else {
         eventTarget.addEventListener('pointermove', onMove, { passive: true });
       }
@@ -80,7 +70,6 @@ export default {
           if (rafId != null) cancelAnimationFrame(rafId);
           eventTarget.removeEventListener('pointermove', onMove);
           window.removeEventListener('deviceorientation', onGyroCompass);
-          if (gyroPermission) eventTarget.removeEventListener('pointerdown', gyroPermission);
           restore();
         }
       };
@@ -118,23 +107,10 @@ export default {
       yTarget = clamp((event.beta || 0) / 30, -1, 1);
     };
 
-    let permissionHandler = null;
     if (useGyro) {
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        permissionHandler = async () => {
-          try {
-            const result = await DeviceOrientationEvent.requestPermission();
-            if (result === 'granted') window.addEventListener('deviceorientation', onGyro, { passive: true });
-          } catch (_error) {
-            // Permission can only be requested from a user gesture and may be denied.
-          } finally {
-            eventTarget.removeEventListener('pointerdown', permissionHandler);
-          }
-        };
-        eventTarget.addEventListener('pointerdown', permissionHandler, { once: true });
-      } else {
-        window.addEventListener('deviceorientation', onGyro, { passive: true });
-      }
+      ensureGyroPermission().then((granted) => {
+        if (granted && alive) window.addEventListener('deviceorientation', onGyro, { passive: true });
+      });
     } else {
       eventTarget.addEventListener('pointermove', onPointerMove, { passive: true });
     }
@@ -168,7 +144,6 @@ export default {
         alive = false;
         if (rafId != null) cancelAnimationFrame(rafId);
         eventTarget.removeEventListener('pointermove', onPointerMove);
-        if (permissionHandler) eventTarget.removeEventListener('pointerdown', permissionHandler);
         window.removeEventListener('deviceorientation', onGyro);
         restores.forEach((restore) => restore());
       }

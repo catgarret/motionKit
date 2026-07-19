@@ -1,4 +1,4 @@
-import { clamp, lerp, snapshotInlineStyles } from '../utils.js';
+import { clamp, ensureGyroPermission, lerp, snapshotInlineStyles } from '../utils.js';
 
 export default {
   create(el, opts) {
@@ -98,7 +98,6 @@ export default {
     };
 
     let gyroHandler = null;
-    let permissionHandler = null;
     if (coarse) {
       gyroHandler = (event) => {
         const gx = clamp((event.gamma || 0) / 28, -1, 1);
@@ -111,18 +110,11 @@ export default {
         hovering = true;
         ensureTick();
       };
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        permissionHandler = async () => {
-          try {
-            if (await DeviceOrientationEvent.requestPermission() === 'granted') {
-              window.addEventListener('deviceorientation', gyroHandler, { passive: true });
-            }
-          } catch (_error) { /* permission requires a user gesture and may be denied */ }
-        };
-        el.addEventListener('pointerdown', permissionHandler, { once: true });
-      } else {
-        window.addEventListener('deviceorientation', gyroHandler, { passive: true });
-      }
+      // The shared gate resolves on the first tap anywhere (iOS gesture rule);
+      // guard against the instance being destroyed before permission returns.
+      ensureGyroPermission().then((granted) => {
+        if (granted && alive) window.addEventListener('deviceorientation', gyroHandler, { passive: true });
+      });
     } else {
       el.addEventListener('pointerenter', onEnter);
       el.addEventListener('pointermove', onMove, { passive: true });
@@ -141,7 +133,6 @@ export default {
         el.removeEventListener('pointermove', onMove);
         el.removeEventListener('pointerleave', onLeave);
         if (gyroHandler) window.removeEventListener('deviceorientation', gyroHandler);
-        if (permissionHandler) el.removeEventListener('pointerdown', permissionHandler);
         glareWrap?.remove();
         restore();
       }

@@ -34,6 +34,34 @@ export function env() {
   };
 }
 
+// iOS 13+ gates DeviceOrientation behind an explicit permission that must be
+// requested from a real user gesture — and current WebKit only honours the
+// request from a `click`/`touchend`, not always a `pointerdown`. This resolves
+// once (shared across every gyro module) on the first tap anywhere on the page,
+// so a single interaction unlocks tilt + compass together instead of each
+// element needing its own exact tap.
+let gyroPermissionPromise = null;
+export function ensureGyroPermission() {
+  if (typeof DeviceOrientationEvent === 'undefined') return Promise.resolve(false);
+  // Android / desktop have no permission gate — motion events flow immediately.
+  if (typeof DeviceOrientationEvent.requestPermission !== 'function') return Promise.resolve(true);
+  if (gyroPermissionPromise) return gyroPermissionPromise;
+  gyroPermissionPromise = new Promise((resolve) => {
+    const ask = async () => {
+      try { resolve((await DeviceOrientationEvent.requestPermission()) === 'granted'); }
+      catch (_error) { resolve(false); }
+    };
+    const onGesture = () => {
+      document.removeEventListener('click', onGesture);
+      document.removeEventListener('touchend', onGesture);
+      ask();
+    };
+    document.addEventListener('click', onGesture);
+    document.addEventListener('touchend', onGesture);
+  });
+  return gyroPermissionPromise;
+}
+
 export function lerp(a, b, t) {
   return a + (b - a) * t;
 }
