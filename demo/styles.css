@@ -15,7 +15,9 @@
       --shadow-hover:0 2px 4px rgba(28,22,12,.06), 0 20px 50px rgba(28,22,12,.11);
     }
     *{box-sizing:border-box}
-    html{scroll-behavior:auto;overflow-anchor:none;overflow-x:clip}
+    /* Reserve the scrollbar's space always, so toggling overflow:hidden (intro
+       lock, sitemap, lightbox) doesn't change the page width and jolt the layout. */
+    html{scroll-behavior:auto;overflow-anchor:none;overflow-x:clip;scrollbar-gutter:stable}
     body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--font-sans);overflow-anchor:none;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-x:clip;max-width:100%}
     button,a{font:inherit}
     ::selection{background:color-mix(in srgb,var(--accent) 24%,transparent)}

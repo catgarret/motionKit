@@ -179,6 +179,7 @@ function createManager() {
   let originX = 0;
   let originY = 0;
   let lazyInstance = null;
+  let sharing = false; // true while the native share sheet is up (+ a short grace)
 
   const controls = { root, backdrop, shell, toolbar, stage, image, closeButton, previous, next, zoomIn, zoomOut, zoomReset, shareButton, info, title, description, meta, minimap, custom, counter };
 
@@ -433,6 +434,7 @@ function createManager() {
   };
 
   backdrop.addEventListener('click', () => {
+    if (sharing) return;
     if (activeEntry?.closeOnBackdrop !== false) close();
   });
   // The stage (which covers the middle band for pan/zoom) also counts as
@@ -443,7 +445,7 @@ function createManager() {
     stageDownAt = { x: event.clientX, y: event.clientY };
   });
   stage.addEventListener('click', (event) => {
-    if (activeEntry?.closeOnBackdrop === false || scale > 1.001) return;
+    if (sharing || activeEntry?.closeOnBackdrop === false || scale > 1.001) return;
     if (event.target !== stage && event.target !== stageContent) return;
     if (stageDownAt && Math.hypot(event.clientX - stageDownAt.x, event.clientY - stageDownAt.y) > 8) return;
     close();
@@ -481,9 +483,13 @@ function createManager() {
       // Only hand real http(s) URLs to navigator.share — sharing a file:// (or
       // blob:) URL crashes the renderer (RESULT_CODE_KILLED_BAD_MESSAGE). For
       // those, copy instead so opening the demo from disk never crashes.
-      if (httpish && navigator.share && (!navigator.canShare || navigator.canShare(data))) await navigator.share(data);
-      else await copy();
-    } catch (_error) { /* user cancelled or blocked */ }
+      if (httpish && navigator.share && (!navigator.canShare || navigator.canShare(data))) {
+        // Dismissing the native share sheet clicks the page — guard against that
+        // click landing on the backdrop/stage and closing the viewer.
+        sharing = true;
+        try { await navigator.share(data); } finally { setTimeout(() => { sharing = false; }, 400); }
+      } else await copy();
+    } catch (_error) { setTimeout(() => { sharing = false; }, 400); }
   });
   stage.addEventListener('wheel', onWheel, { passive: false });
   stage.addEventListener('pointerdown', onPointerDown);

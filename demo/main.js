@@ -44,6 +44,11 @@
       wordmark.textContent='Kineto';
       overlay.appendChild(wordmark);
       document.body.appendChild(overlay);
+      // Lock scrolling at the root while the intro is up: otherwise the page
+      // scrolls behind the overlay and lazy images loading in shift the layout,
+      // so releasing the intro leaves the scroll position jumping around.
+      const introScrollLock = document.documentElement.style.overflow;
+      document.documentElement.style.overflow = 'hidden';
       // Fast/file loads can already be complete when this script runs —
       // resolve immediately then, otherwise the loader would never finish
       // (and skipping it entirely meant no intro at all).
@@ -51,7 +56,7 @@
         ? Promise.resolve()
         : new Promise(resolve=>window.addEventListener('load',resolve,{once:true}));
       let finished=false;
-      const finishIntro=()=>{ if(finished)return; finished=true; if(overlay.parentNode)overlay.remove(); startModules(); };
+      const finishIntro=()=>{ if(finished)return; finished=true; if(overlay.parentNode)overlay.remove(); document.documentElement.style.overflow=introScrollLock; startModules(); };
       try{
         Kineto.loader(overlay,{
           type:'slot',

@@ -105,7 +105,7 @@ export default {
       const { width, slideWidth, step } = metrics();
       const centerOffset = centered ? (width - slideWidth) / 2 : 0;
       slides.forEach((slide, slideIndex) => {
-        const distance = slideIndex - position;
+        const distance = loop ? wrapDelta(slideIndex - position) : slideIndex - position;
         const absolute = Math.abs(distance);
         const baseX = centerOffset + distance * step * (coverflow ? Number(opts.spacing ?? 0.62) : 1);
         if (coverflow) {
@@ -151,21 +151,27 @@ export default {
     };
     const wake = () => { if (alive && rafId == null) rafId = requestAnimationFrame(tick); };
 
-    const normalize = (value) => {
-      if (loop) return ((Math.round(value) % slides.length) + slides.length) % slides.length;
-      return clamp(Math.round(value), 0, maxIndex);
-    };
-    const goTo = (value) => {
-      const nextIndex = normalize(value);
-      if (nextIndex !== index) {
-        index = nextIndex;
-        syncState();
-      }
-      target = index;
+    const slideCount = slides.length;
+    // Shortest signed distance around the ring, mapped into [-n/2, n/2]. A slide
+    // past the halfway point teleports to the near side while it's off-screen
+    // (or faded out in coverflow) — that's what makes the loop seamless with no
+    // cloned DOM nodes and no snap-back when wrapping last → first.
+    const wrapDelta = (d) => { d = ((d % slideCount) + slideCount) % slideCount; return d > slideCount / 2 ? d - slideCount : d; };
+    const normalize = (value) => ((Math.round(value) % slideCount) + slideCount) % slideCount;
+    // In loop mode the continuous target just keeps climbing/falling forever, so
+    // the spring never has to unwind the whole track to wrap around.
+    const settle = (raw) => {
+      target = loop ? raw : clamp(raw, 0, maxIndex);
+      const nextIndex = loop ? normalize(target) : clamp(Math.round(target), 0, maxIndex);
+      if (nextIndex !== index) { index = nextIndex; syncState(); }
       wake();
     };
-    const next = () => goTo(index >= maxIndex && loop ? 0 : index + 1);
-    const prev = () => goTo(index <= 0 && loop ? maxIndex : index - 1);
+    const goTo = (value) => {
+      if (loop) { const base = Math.round(target); settle(base + Math.round(wrapDelta(value - base))); }
+      else settle(value);
+    };
+    const next = () => (loop ? settle(Math.round(target) + 1) : goTo(index + 1));
+    const prev = () => (loop ? settle(Math.round(target) - 1) : goTo(index - 1));
 
     const stop = () => { clearInterval(timer); timer = null; };
     const start = () => {
