@@ -663,16 +663,27 @@ export default {
         const reel = document.createElement('span');
         reel.className = 'kt-counter-reel';
         reel.style.cssText = 'display:flex;flex-direction:column;will-change:transform;';
+        // Build the digit strip from start → target. Counting up scrolls the reel
+        // upward (new digits rise in from below); counting down scrolls it
+        // downward (new digits drop in from above), which reads as a decreasing
+        // odometer instead of everything rolling the same way.
+        const digits = [];
         for (let k = 0; k <= steps; k += 1) {
-          const digit = countingUp ? (startDigit + k) % 10 : (((startDigit - k) % 10) + 10) % 10;
+          digits.push(countingUp ? (startDigit + k) % 10 : (((startDigit - k) % 10) + 10) % 10);
+        }
+        if (!countingUp) digits.reverse(); // top→bottom becomes target … start
+        digits.forEach((digit) => {
           const item = document.createElement('span');
           item.textContent = String(digit);
           item.style.cssText = `height:${lineHeight}px;line-height:${lineHeight}px;display:flex;align-items:center;justify-content:center;`;
           reel.appendChild(item);
-        }
+        });
         viewport.appendChild(reel);
         el.appendChild(viewport);
-        slots.push({ reel, steps });
+        // Up: 0 → -(steps·L), the reel rises. Down: the reel begins scrolled to
+        // its bottom (showing `start`) and settles at 0 (showing `target` on top),
+        // so the strip travels downward.
+        slots.push({ reel, fromY: countingUp ? 0 : -(steps * lineHeight), toY: countingUp ? -(steps * lineHeight) : 0 });
       }
       appendAffix(el, suffix, 'kt-counter-suffix');
 
@@ -682,16 +693,16 @@ export default {
           scrollTrigger,
           onComplete: () => opts.onComplete?.(el)
         });
-        slots.forEach(({ reel, steps }, index) => {
-          timeline.fromTo(reel, { y: 0 }, {
-            y: -(steps * lineHeight),
+        slots.forEach(({ reel, fromY, toY }, index) => {
+          timeline.fromTo(reel, { y: fromY }, {
+            y: toY,
             duration: duration + index * Number(opts.stagger ?? 0.1),
             ease: opts.ease || 'power3.inOut'
           }, 0);
         });
         addAnimation(timeline);
       } else {
-        slots.forEach(({ reel, steps }) => { reel.style.transform = `translateY(${-steps * lineHeight}px)`; });
+        slots.forEach(({ reel, toY }) => { reel.style.transform = `translateY(${toY}px)`; });
         opts.onComplete?.(el);
       }
     }

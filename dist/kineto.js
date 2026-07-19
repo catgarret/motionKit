@@ -352,7 +352,7 @@ function ie() {
 	e.id = "kineto-inline-fallback", e.textContent = "\n    @property --kt-angle { syntax: \"<angle>\"; initial-value: 0deg; inherits: false; }\n    @keyframes kt-border-spin { to { --kt-angle: 360deg; } }\n    @keyframes kt-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }\n    @keyframes kt-aurora { to { transform: rotate(360deg); } }\n    @keyframes kt-aurora-drift { 0% { transform: translate3d(-3%,-2%,0) scale(1.06); } 100% { transform: translate3d(3%,2%,0) scale(1.12); } }\n    @keyframes kt-caret { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }\n    .kt-cursor-active, .kt-cursor-active * { cursor: none !important; }\n    .kt-cursor-scope, .kt-cursor-scope * { cursor: none !important; }\n    .kt-tw-caret { animation: kt-caret .8s step-end infinite; }\n    .kt-slide { position: relative; flex: 0 0 100%; min-width: 0; }\n    .kt-slider-wrap { position: relative; overflow: hidden; }\n    @media (prefers-reduced-motion: reduce) {\n      [data-kt-reveal], [data-kt-text-split], [data-kt-blur-text] { opacity: 1 !important; transform: none !important; filter: none !important; }\n    }\n  ", document.head.appendChild(e);
 }
 var Z = {
-	version: "0.8.7",
+	version: "0.8.8",
 	get env() {
 		return U ||= d(), U;
 	},
@@ -1394,13 +1394,15 @@ var ve = {
 				s.className = "kt-counter-slot", s.style.cssText = `display:inline-block;overflow:hidden;height:${c}px;vertical-align:bottom;`;
 				let l = document.createElement("span");
 				l.className = "kt-counter-reel", l.style.cssText = "display:flex;flex-direction:column;will-change:transform;";
-				for (let e = 0; e <= o; e += 1) {
-					let t = g ? (i + e) % 10 : ((i - e) % 10 + 10) % 10, n = document.createElement("span");
-					n.textContent = String(t), n.style.cssText = `height:${c}px;line-height:${c}px;display:flex;align-items:center;justify-content:center;`, l.appendChild(n);
-				}
-				s.appendChild(l), e.appendChild(s), v.push({
+				let u = [];
+				for (let e = 0; e <= o; e += 1) u.push(g ? (i + e) % 10 : ((i - e) % 10 + 10) % 10);
+				g || u.reverse(), u.forEach((e) => {
+					let t = document.createElement("span");
+					t.textContent = String(e), t.style.cssText = `height:${c}px;line-height:${c}px;display:flex;align-items:center;justify-content:center;`, l.appendChild(t);
+				}), s.appendChild(l), e.appendChild(s), v.push({
 					reel: l,
-					steps: o
+					fromY: g ? 0 : -(o * c),
+					toY: g ? -(o * c) : 0
 				});
 			}
 			if (he(e, p, "kt-counter-suffix"), n) {
@@ -1409,15 +1411,15 @@ var ve = {
 					scrollTrigger: _,
 					onComplete: () => t.onComplete?.(e)
 				});
-				v.forEach(({ reel: e, steps: n }, i) => {
-					r.fromTo(e, { y: 0 }, {
-						y: -(n * c),
-						duration: u + i * Number(t.stagger ?? .1),
+				v.forEach(({ reel: e, fromY: n, toY: i }, a) => {
+					r.fromTo(e, { y: n }, {
+						y: i,
+						duration: u + a * Number(t.stagger ?? .1),
 						ease: t.ease || "power3.inOut"
 					}, 0);
 				}), S(r);
-			} else v.forEach(({ reel: e, steps: t }) => {
-				e.style.transform = `translateY(${-t * c}px)`;
+			} else v.forEach(({ reel: e, toY: t }) => {
+				e.style.transform = `translateY(${t}px)`;
 			}), t.onComplete?.(e);
 		}
 		return t.separatorColor && e.querySelectorAll(".kt-counter-separator").forEach((e) => {

@@ -146,7 +146,7 @@
     .media-card .demo-stage{padding:0;aspect-ratio:4/3}
     .media-card img{width:100%;height:100%;object-fit:cover}
 
-    .overflow-display{width:280px;max-width:100%;padding:14px 18px;border-radius:10px;background:#101318;color:#ffd166;font:700 17px/1.25 var(--font-mono);border:1px solid #2b333f;box-shadow:inset 0 0 0 2px #0b0d10,inset 0 12px 24px rgba(0,0,0,.35)}
+    .overflow-display{width:100%;max-width:340px;padding:14px 18px;border-radius:10px;background:#101318;color:#ffd166;font:700 17px/1.25 var(--font-mono);border:1px solid #2b333f;box-shadow:inset 0 0 0 2px #0b0d10,inset 0 12px 24px rgba(0,0,0,.35)}
 
     .glow-demo{min-height:290px;padding:50px;text-align:center;display:grid;place-items:center;background:linear-gradient(150deg,#171a21,#232833);color:#fff;border:1px solid var(--line)}
     .glow-demo>*{position:relative;z-index:1}
@@ -229,6 +229,12 @@
       .grid{gap:14px}
       .glow-demo{padding:30px}
       .section{padding:80px 0 60px}
+    }
+    /* Below ~560px the 330px min column no longer fits, so drop to a single
+       fluid column — otherwise the grid forces horizontal overflow and cards
+       (and their content, e.g. the overflow-text bar) get clipped at the edge. */
+    @media(max-width:560px){
+      .grid{grid-template-columns:1fr}
     }
     .fullpage-demo{height:360px;border-radius:var(--r-stage);background:var(--panel2);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--line) 55%,transparent)}
     .fp-slide{display:grid;place-items:center;gap:6px;align-content:center;font:800 clamp(1.4rem,2.6vw,2.2rem)/1.1 var(--font-sans);letter-spacing:-.03em}

@@ -90,6 +90,20 @@
   .kt-playground__head-actions{width:100%;justify-content:flex-end}
   .kt-drawer-sheet .kt-playground__controls{grid-template-columns:1fr 1fr}
 }
+/* Narrow phones (iPhone-width): single-column controls, tighter gutters so the
+   sheet content isn't cramped or clipped, and let the header actions wrap. */
+@media(max-width:480px){
+  .kt-drawer-sheet{max-height:82vh}
+  .kt-playground__body.is-portal{padding:0 16px 20px}
+  .kt-playground__drawer-head{margin:0 -16px 16px;padding:16px 16px 13px;gap:10px}
+  .kt-playground__drawer-heading strong{font-size:15px}
+  .kt-playground__head-actions{flex-wrap:wrap;gap:8px}
+  .kt-playground__head-actions .kt-playground__toolbar{flex:1 1 auto}
+  .kt-playground__head-actions .kt-playground__toolbar button{flex:1 1 auto}
+  .kt-drawer-sheet .kt-playground__controls{grid-template-columns:1fr}
+  .kt-drawer-sheet .kt-playground__group{padding:14px 14px 16px}
+  .kt-playground__pre,.kt-drawer-sheet .kt-playground__pre{max-height:160px}
+}
 
 /* floating replay icon over the demo stage */
 .replay-fab{position:absolute;right:10px;bottom:10px;left:auto;z-index:6;width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,var(--panel) 82%,transparent);backdrop-filter:blur(8px);color:var(--muted);font-size:15px;line-height:1;opacity:.8;transition:opacity .15s ease,color .15s ease,border-color .15s ease}
