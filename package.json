@@ -60,6 +60,8 @@
     "src/adapters",
     "demo",
     "docs",
+    "!**/.fuse_hidden*",
+    "!**/.DS_Store",
     "assets/logo.svg",
     "FEATURE_CONTRACT.md",
     "kineto.features.json",

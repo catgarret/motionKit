@@ -1,0 +1,9 @@
+# Keep OS / FUSE-filesystem junk out of the published tarball. The `files`
+# whitelist in package.json includes whole folders (demo, docs) — these patterns
+# strip the stray artifacts that would otherwise ride along.
+.DS_Store
+**/.DS_Store
+.fuse_hidden*
+**/.fuse_hidden*
+Thumbs.db
+**/Thumbs.db
