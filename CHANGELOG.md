@@ -2,6 +2,10 @@
 
 Kineto follows Semantic Versioning. Public scope is additionally governed by `FEATURE_CONTRACT.md`.
 
+## [0.8.11]
+
+- **Packaging — leaner tarball**: `.DS_Store` and stray `.fuse_hidden*` filesystem artifacts are excluded from the published package via negation patterns in the `files` list (a plain `.npmignore` is bypassed when `files` whitelists whole folders). Publish size dropped and no junk files ship.
+
 ## [0.8.10]
 
 - **Fix — iOS gyroscope (tilt + compass)**: motion effects stopped working on iOS because the DeviceOrientation permission was requested per-element from `pointerdown`, which recent WebKit no longer treats as a valid user-activation for the permission prompt. There is now one shared permission gate triggered by the first `click`/`touchend` anywhere on the page, so a single tap unlocks the gyroscope for every tilt and compass element at once.
