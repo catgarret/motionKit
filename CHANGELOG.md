@@ -2,6 +2,10 @@
 
 Kineto follows Semantic Versioning. Public scope is additionally governed by `FEATURE_CONTRACT.md`.
 
+## [0.8.15]
+
+- **Demo — Fullpage inner-scroll shown**: the "Fullpage Sections" demo now has a long section (02) that scrolls its own content before paging to the next, demonstrating the inner-scroll-then-advance behavior added in 0.8.13.
+
 ## [0.8.14]
 
 - **Wipe/mask — actually animates now**: the real cause was that the bundled gsap won't tween a `clip-path: inset()` string (it stayed frozen fully-clipped = blank). Wipe/mask now run on a numeric proxy tween and build the inset string in onUpdate, so the reveal always plays (via ScrollTrigger or the IntersectionObserver backup) and on replay.
