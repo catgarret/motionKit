@@ -1,6 +1,6 @@
 {
   "name": "@dong-gri/kineto",
-  "version": "0.8.20",
+  "version": "0.8.22",
   "description": "Interactive web motion effects with live controls and copy-ready code — 34 modules for JavaScript, React, Vue, and jQuery. Zero required dependencies.",
   "type": "module",
   "keywords": [
@@ -85,6 +85,7 @@
     "build:min": "node scripts/build-min.mjs",
     "build": "npm run build:esm && npm run build:umd && npm run build:min && npm run demo:cdn",
     "demo:cdn": "node scripts/build-demo-cdn.mjs",
+    "purge": "node scripts/purge-cdn.mjs",
     "test:contract": "node tests/feature-contract.mjs",
     "test:browser": "node tests/retry-browser-test.mjs tests/browser-smoke.mjs",
     "test:package": "node tests/package-check.mjs",

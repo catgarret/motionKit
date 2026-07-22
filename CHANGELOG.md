@@ -2,6 +2,14 @@
 
 Kineto follows Semantic Versioning. Public scope is additionally governed by `FEATURE_CONTRACT.md`.
 
+## [0.8.22]
+
+- **Demo deploy — back to @latest + purge script**: the site loads the library from `@latest` again; run `npm run purge` after publishing to flush the jsDelivr cache so the newest build shows immediately.
+
+## [0.8.21]
+
+- **Demo deploy — pin exact version (fixes stale fixes)**: the generated site now loads the library from `@<version>` instead of `@latest`. jsDelivr caches `@latest` for hours/days, so published library fixes (wipe, slider loop, counter…) kept serving an old bundle on the demo. Pinning the immutable exact version loads each release fresh, no purge needed.
+
 ## [0.8.20]
 
 - **Fix — progress ring off-center (root cause)**: a mobile `@media` rule lifted *every* `.kt-progress-ring` with `bottom:calc(...)!important`, shoving the in-card static ring up ~78px. Scoped it to `body>.kt-progress-ring` so only the floating corner ring is lifted; the demo ring now centers.

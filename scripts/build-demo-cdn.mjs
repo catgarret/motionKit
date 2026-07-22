@@ -18,8 +18,11 @@ const version = pkg.version;
 const SRC = path.join(root, 'demo');
 const OUT = path.join(root, 'site');
 
-// Always resolve to the newest published build (@latest) rather than pinning an
-// exact version — a pinned number 404s if that version was never published.
+// Load the newest published build via @latest. NOTE: jsDelivr caches @latest for
+// hours, so after `npm publish` run `npm run purge` to flush the CDN — otherwise
+// the demo keeps serving the previous bundle (this is why library fixes seemed
+// not to apply). @latest keeps the demo on the newest release without editing
+// the URL each time.
 const cdnBase = `https://cdn.jsdelivr.net/npm/@dong-gri/kineto@latest/dist`;
 
 // 1. Fresh copy of the whole demo tree (html, js, css, assets…).
