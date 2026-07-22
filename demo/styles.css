@@ -17,7 +17,9 @@
     *{box-sizing:border-box}
     /* Reserve the scrollbar's space always, so toggling overflow:hidden (intro
        lock, sitemap, lightbox) doesn't change the page width and jolt the layout. */
-    html{scroll-behavior:auto;overflow-anchor:none;overflow-x:clip}
+    /* Base bg on <html> too, so iOS safe-area / overscroll regions (notch, home
+       bar) show the page colour instead of white. */
+    html{scroll-behavior:auto;overflow-anchor:none;overflow-x:clip;background:var(--bg)}
     /* Reserve scrollbar space only where there's a classic scrollbar (desktop).
        On touch (overlay scrollbars) it's unneeded and can jitter scrolling. */
     @media(pointer:fine){html{scrollbar-gutter:stable}}
@@ -32,7 +34,7 @@
        bottom bar — scoping to body> keeps this off the in-card static demo ring,
        which is position:relative and would otherwise be shoved up ~78px. */
     @media(max-width:1080px){body>.kt-progress-ring{bottom:calc(64px + max(14px,env(safe-area-inset-bottom)))!important}}
-    .site-header{position:fixed;z-index:1000;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:13px 26px;background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent);color:var(--text)}
+    .site-header{position:fixed;z-index:1000;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:calc(13px + env(safe-area-inset-top)) max(26px,env(safe-area-inset-right)) 13px max(26px,env(safe-area-inset-left));background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent);color:var(--text)}
     /* buttons don't inherit color by default (they use the black system
        ButtonText), so the brand text went invisible in dark mode — force it. */
     .brand{font-weight:900;letter-spacing:-.04em;display:inline-flex;align-items:center;gap:9px;background:none;border:0;padding:0;cursor:pointer;font-family:inherit;color:var(--text)}

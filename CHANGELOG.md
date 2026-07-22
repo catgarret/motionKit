@@ -2,6 +2,11 @@
 
 Kineto follows Semantic Versioning. Public scope is additionally governed by `FEATURE_CONTRACT.md`.
 
+## [0.8.24]
+
+- **Demo — iOS notch & home-bar**: `viewport-fit=cover` + a `theme-color` meta (kept in sync with the light/dark toggle) + base bg on `<html>` + safe-area padding on the header, so the notch and home-bar areas match the page instead of showing mismatched colors.
+- **Fix — lazy blur-up/fade/polaroid replay**: these animate the <img> via a CSS transition that lingered after the first run, so on replay the start value animated and immediately cancelled the reveal (nothing visible). The transition is now reset + a reflow forced before each run, so replay re-animates from the start.
+
 ## [0.8.23]
 
 - **Fix — Wipe/mask stayed blank (real bug)**: the clip branch referenced `ease` before its declaration (TDZ), so `play()` threw and the clip never animated — the element stayed fully clipped (white). ease is now computed inside the branch; wipe reveals correctly.

@@ -111,7 +111,9 @@
       }
     });
     (()=>{const themeButton=document.getElementById('theme');
-    const syncTheme=()=>themeButton.setAttribute('aria-checked',document.documentElement.classList.contains('light')?'true':'false');
+    const themeColorMeta=document.getElementById('theme-color-meta');
+    const syncThemeColor=()=>{ if(!themeColorMeta)return; const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); if(bg) themeColorMeta.setAttribute('content',bg); };
+    const syncTheme=()=>{themeButton.setAttribute('aria-checked',document.documentElement.classList.contains('light')?'true':'false');syncThemeColor();};
     syncTheme();
     themeButton.addEventListener('click',()=>{const light=document.documentElement.classList.toggle('light');syncTheme();try{localStorage.setItem('kt-theme',light?'light':'dark')}catch(_){}});})();
 

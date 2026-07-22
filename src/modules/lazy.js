@@ -322,7 +322,12 @@ export default {
 
       if (effect === 'fade') {
         el.src = src;
+        // Clear any leftover transition from a previous run + force a reflow, so
+        // the start (opacity 0) applies instantly instead of animating and
+        // cancelling out the reveal on replay.
+        el.style.transition = 'none';
         el.style.opacity = '0';
+        void el.offsetWidth;
         el.style.transition = `opacity ${Math.max(0, Number(opts.duration ?? 0.7))}s ${opts.ease || 'ease'}`;
         requestAnimationFrame(() => { el.style.opacity = '1'; });
         opts.onLoad?.(el, image);
@@ -331,10 +336,12 @@ export default {
 
       if (effect === 'blur-up') {
         el.src = src;
+        el.style.transition = 'none'; // reset so replay re-animates from the start
         el.style.opacity = '1';
         el.style.filter = `blur(${Math.max(0, Number(opts.blur ?? 18))}px)`;
         el.style.transform = `scale(${Math.max(1, Number(opts.startScale ?? 1.06))})`;
         const duration = Math.max(0, Number(opts.duration ?? 0.85));
+        void el.offsetWidth;
         requestAnimationFrame(() => {
           el.style.transition = `filter ${duration}s ease,transform ${duration}s cubic-bezier(.22,.8,.3,1)`;
           el.style.filter = 'blur(0px)';
@@ -357,10 +364,12 @@ export default {
           layers.push(frame);
         }
         const duration = Math.max(0.2, Number(opts.duration ?? 2.4));
+        el.style.transition = 'none'; // reset so replay re-animates from the start
         el.style.opacity = '1';
         el.style.filter = 'brightness(2.1) saturate(.05) contrast(.72) sepia(.28) blur(7px)';
         el.style.transform = `rotate(${Number(opts.rotate ?? -2)}deg) scale(.965)`;
         wrapper.style.transition = 'none';
+        void el.offsetWidth;
         requestAnimationFrame(() => requestAnimationFrame(() => {
           el.style.transition = `filter ${duration}s cubic-bezier(.3,.1,.25,1),transform ${Math.min(duration, 1.1)}s cubic-bezier(.34,1.4,.44,1)`;
           el.style.filter = 'none';
