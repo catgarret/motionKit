@@ -27,10 +27,15 @@ export default {
     const duration = Math.max(600, Number(opts.duration ?? 3200));
     const dismissible = opts.dismissible !== false;
     const defaultMessage = opts.message || el.getAttribute('data-kt-message') || el.textContent.trim() || 'Done';
+    // A countdown progress bar that drains over the duration (pauses on hover).
+    const showProgress = opts.progress === true;
+    // Cap how many toasts stack at once — the oldest is evicted past this.
+    const maxVisible = Math.max(1, Number(opts.max ?? 5));
 
     const show = (message, overrides = {}) => {
       const kind = overrides.type || type;
       const region = regionFor(overrides.position || position);
+      while (region.children.length >= maxVisible) region.firstElementChild?.remove();
       const toast = document.createElement('div');
       toast.className = `kt-toast kt-toast--${kind}`;
       toast.setAttribute('role', kind === 'error' || kind === 'warning' ? 'alert' : 'status');
@@ -57,6 +62,7 @@ export default {
       let timer = null;
       let remaining = Number(overrides.duration ?? duration);
       let startedAt = 0;
+      let barAnim = null;
       const dismiss = () => {
         clearTimeout(timer);
         if (!toast.isConnected) return;
@@ -68,8 +74,18 @@ export default {
         );
         out.onfinish = done; out.oncancel = done;
       };
-      const arm = () => { startedAt = performance.now(); timer = setTimeout(dismiss, remaining); };
-      const pause = () => { clearTimeout(timer); remaining -= performance.now() - startedAt; };
+      // Progress bar drives (and visualises) the countdown when enabled; hover
+      // pauses both the bar and the dismissal so they stay in sync.
+      if (showProgress && !reduce && toast.animate) {
+        const bar = document.createElement('span');
+        bar.className = 'kt-toast__bar';
+        bar.setAttribute('aria-hidden', 'true');
+        toast.appendChild(bar);
+        barAnim = bar.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: remaining, easing: 'linear' });
+        barAnim.onfinish = dismiss;
+      }
+      const arm = () => { if (barAnim) { barAnim.play(); } else { startedAt = performance.now(); timer = setTimeout(dismiss, remaining); } };
+      const pause = () => { if (barAnim) { barAnim.pause(); } else { clearTimeout(timer); remaining -= performance.now() - startedAt; } };
       toast.addEventListener('mouseenter', pause);
       toast.addEventListener('mouseleave', arm);
       toast.addEventListener('focusin', pause);

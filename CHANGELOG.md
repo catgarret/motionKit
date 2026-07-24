@@ -2,9 +2,22 @@
 
 Kineto follows Semantic Versioning. Public scope is additionally governed by `FEATURE_CONTRACT.md`.
 
+## [0.8.32]
+
+- **New module `data-kt-cover-reveal` (42 → 43)**: one or two coloured panels cover an element and sweep away when it scrolls into view — a block/curtain reveal. Options: `color`, `color2`, `direction`, `duration`, `delay`, `ease`, `layers` (1–3), `stagger`, `threshold`.
+- **Hold-to-confirm now performs the action** on completion, so it's usable without extra wiring: an `<a href>` navigates, a submit button (or `submit:true` / `data-kt-hold-submit`) submits the closest form, and `action="#selector"` clicks that element. The `kt-hold-confirm` event is cancelable (preventDefault to skip), and `onComplete(el)` still fires. Opt out with `submit:false`.
+- **Toast**: opt-in countdown **progress bar** (`progress:true`, colour `--kt-toast-bar`/`--kt-toast-accent`) that pauses with the timer on hover; a **stack limit** (`max`, default 5) that evicts the oldest; multiple toasts stack with spacing. Position, size, colours and layout stay CSS-customizable (`--kt-toast-*`).
+- **Cursor**: the demo cursor is reworked to match a proper reference — a small dot + smoothly-lagging outlined ring that inverts over content (`mix-blend-mode:difference`) and expands over links (dot hides). All via existing options (`hoverScale`, `hoverEffect`, `hideDotOnHover`, `mixBlendMode`, `borderWidth`).
+- **Demo**: removed the pointer-parallax drift from the hero (the main content no longer moves with the mouse).
+- **Lightbox `crossfade` fixed**: it was identical to `fade`. It now does a true cross-dissolve (outgoing frame fades out over the incoming one), distinct from `fade` (incoming only) and `dissolve` (blur).
+- **Bottom sheet backdrop fix**: no more flash to full black then settle — the fade now targets the configured `backdropOpacity`, and that value is applied to the backdrop element itself (it was previously set where it couldn't reach it, so the option was ignored).
+- **Mega-menu keyboard**: ↑/↓ now move between links inside an open panel (in addition to ←/→ across top items, Enter/Space/↓ to open, Esc to close).
+- **Radial carousel geometry fixed**: the items were mis-positioned; the orbit transform origin and centering order are corrected so items sit on the arc.
+- **Mouse Parallax**: reverted the global default multiplier to its original subtle value (the earlier change made the demo hero drift with the pointer). The demo's dedicated parallax card sets `speed` explicitly instead.
+
 ## [0.8.31]
 
-- **New module `data-kt-radial` — radial / circular carousel (41 → 42)**: items orbit a hub docked to any edge (`position: bottom | top | left | right`) so only the focal arc shows — the SOL:enchant / 7 Origin wheel, or the old Naver green-dot dial. Rotate via prev/next, click an item, drag, autoplay, or ←/→. Accessible (role=group, aria-current, live region), reduced-motion snaps. Options: `radius`, `step`, `activeAngle`, `position`, `duration`, `loop`, `drag`, `controls`, `autoplay`.
+- **New module `data-kt-radial` — radial / circular carousel (41 → 42)**: items orbit a hub docked to any edge (`position: bottom | top | left | right`) so only the focal arc shows. Rotate via prev/next, click an item, drag, autoplay, or ←/→. Accessible (role=group, aria-current, live region), reduced-motion snaps. Options: `radius`, `step`, `activeAngle`, `position`, `duration`, `loop`, `drag`, `controls`, `autoplay`.
 - **Mega-menu / GNB — real-world options**:
   - Per-item trigger override: `<li data-kt-menu-trigger="click">` mixes click dropdowns with hover mega-menus in one bar.
   - Hover zone: `<li data-kt-menu-open="#selector">` opens that item when the pointer enters any matching element (e.g. a banner opens the mega).

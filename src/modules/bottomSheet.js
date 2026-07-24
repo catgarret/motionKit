@@ -48,7 +48,7 @@ export default {
       if (open) return;
       open = true;
       lastFocus = document.activeElement;
-      if (backdrop) { document.body.appendChild(backdrop); backdrop.hidden = false; if (!reduce) backdrop.animate([{ opacity: 0 }, { opacity: 1 }], { duration: duration * 1000, easing: 'ease' }); }
+      if (backdrop) { document.body.appendChild(backdrop); backdrop.hidden = false; if (!reduce) backdrop.animate([{ opacity: 0 }, { opacity: backdropOpacity }], { duration: duration * 1000, easing: 'ease' }); }
       el.hidden = false;
       el.classList.add('kt-open');
       if (anim) anim.cancel();
@@ -65,7 +65,7 @@ export default {
       // Guard on `open`: if the sheet is reopened before this close animation
       // finishes (or is cancelled by the reopen), do NOT hide it.
       const finish = () => { if (!open) { el.hidden = true; if (backdrop) backdrop.hidden = true; } };
-      if (backdrop && !reduce) backdrop.animate([{ opacity: 1 }, { opacity: 0 }], { duration: duration * 800, easing: 'ease' });
+      if (backdrop && !reduce) backdrop.animate([{ opacity: backdropOpacity }, { opacity: 0 }], { duration: duration * 800, easing: 'ease' });
       if (reduce) finish();
       else { if (anim) anim.cancel(); anim = el.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(100%)' }], { duration: duration * 800, easing: 'ease' }); anim.onfinish = finish; anim.oncancel = finish; }
       lastFocus?.focus?.();
@@ -84,7 +84,9 @@ export default {
     };
 
     if (backdrop && dismissible) backdrop.addEventListener('click', doClose);
-    el.style.setProperty('--kt-sheet-backdrop-opacity', String(backdropOpacity));
+    // Set the resting opacity on the backdrop itself (it lives on <body>, not
+    // inside the sheet, so a var on the sheet would never reach it).
+    if (backdrop) backdrop.style.setProperty('--kt-sheet-backdrop-opacity', String(backdropOpacity));
 
     // Drag-to-dismiss on the handle (pointer).
     if (handle && dismissible) {

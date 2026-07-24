@@ -117,7 +117,20 @@ export default {
           event.preventDefault(); entries[(index() - 1 + entries.length) % entries.length].trg.focus();
         }
       };
-      const onPanelKey = (event) => { if (event.key === 'Escape') { doClose(entry); trg.focus(); } };
+      const onPanelKey = (event) => {
+        if (event.key === 'Escape') { doClose(entry); trg.focus(); return; }
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+          // Roving up/down movement between the links inside the open panel.
+          const links = focusables(panel);
+          if (!links.length) return;
+          event.preventDefault();
+          const cur = links.indexOf(document.activeElement);
+          const nextIdx = event.key === 'ArrowDown'
+            ? (cur + 1) % links.length
+            : (cur - 1 + links.length) % links.length;
+          links[nextIdx].focus();
+        }
+      };
       const onFocusOut = (event) => { if (!li.contains(event.relatedTarget)) doClose(entry); };
 
       const hoverMode = itemTrigger === 'hover';

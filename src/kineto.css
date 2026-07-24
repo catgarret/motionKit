@@ -245,11 +245,17 @@ html.kt-preload [data-kt-text-transition] {
 .kt-toast-region--top { left: 50%; top: 0; transform: translateX(-50%); align-items: center; }
 .kt-toast-region--bottom { left: 50%; bottom: 0; transform: translateX(-50%); align-items: center; }
 .kt-toast {
+  position: relative; overflow: hidden;
   pointer-events: auto; display: flex; align-items: center; gap: 12px;
   padding: 12px 14px; border-radius: var(--kt-toast-radius, 12px);
   background: var(--kt-toast-bg, #1c1f26); color: var(--kt-toast-fg, #f6f7fb);
   box-shadow: 0 12px 34px rgba(0,0,0,.32);
   font-size: 14px; line-height: 1.4; max-width: 100%;
+}
+/* Countdown progress bar (opt-in via `progress:true`). Colour = accent. */
+.kt-toast__bar {
+  position: absolute; left: 0; bottom: 0; height: var(--kt-toast-bar-size, 3px); width: 100%;
+  transform-origin: left center; background: var(--kt-toast-bar, var(--kt-toast-accent, #4aa8ff));
 }
 /* Type accent is opt-in only (add your own border/icon via --kt-toast-accent):
    no decorative border by default. */
@@ -323,7 +329,7 @@ html.kt-preload [data-kt-text-transition] {
 .kt-radial--top .kt-radial-hub { left: 50%; top: 0; }
 .kt-radial--left .kt-radial-hub { left: 0; top: 50%; }
 .kt-radial--right .kt-radial-hub { left: 100%; top: 50%; }
-.kt-radial-item { position: absolute; left: 0; top: 0; will-change: transform; }
+.kt-radial-item { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
 .kt-radial-controls { position: absolute; z-index: 200; display: flex; gap: 8px; }
 .kt-radial--bottom .kt-radial-controls, .kt-radial--top .kt-radial-controls { left: 50%; bottom: 12px; transform: translateX(-50%); }
 .kt-radial--left .kt-radial-controls, .kt-radial--right .kt-radial-controls { right: 12px; top: 50%; transform: translateY(-50%); flex-direction: column; }

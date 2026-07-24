@@ -1,10 +1,9 @@
 import { clamp, env } from '../utils.js';
 
-// Radial carousel — items arranged around a circle (like SOL:enchant's media
-// wheel or the old Naver green-dot dial). The wheel can dock to any edge
-// (`position: bottom | top | left | right`) so only an arc peeks in, and the
-// active item sits at the focal angle. Rotate with prev/next buttons, a click on
-// any item, drag, autoplay, or the keyboard (←/→). Accessible: role=group with
+// Radial carousel — items arranged around a circle. The wheel can dock to any
+// edge (`position: bottom | top | left | right`) so only an arc peeks in, and
+// the active item sits at the focal angle. Rotate with prev/next buttons, a
+// click on any item, drag, autoplay, or the keyboard (←/→). Accessible: role=group with
 // aria-roledescription, aria-current on the active item, a polite live region.
 // Reduced motion snaps without the spin. Everything themeable via `.kt-radial*`.
 export default {
@@ -57,7 +56,10 @@ export default {
         }
         const angle = activeAngle + offset * step;
         item.style.transition = reduce || duration === 0 ? 'none' : `transform ${duration}s cubic-bezier(.22,.8,.3,1)`;
-        item.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translate(${radius}px) rotate(${-angle}deg)`;
+        // transform-origin is the hub point (0,0); the inner translate(-50%,-50%)
+        // (applied FIRST) centers the item there, then rotate·translate·rotate
+        // orbits its centre to radius·(cosθ,sinθ), upright.
+        item.style.transform = `rotate(${angle}deg) translate(${radius}px) rotate(${-angle}deg) translate(-50%, -50%)`;
         const on = i === active;
         item.classList.toggle('kt-active', on);
         item.classList.toggle('active-item', on);

@@ -277,6 +277,19 @@ function createManager() {
     activeIndex = (index + activeList.length) % activeList.length;
     activeEntry = activeList[activeIndex];
     resetZoom();
+    const effect = activeEntry.transition || 'rise';
+    // True crossfade: overlay the OUTGOING frame and fade it out while the new
+    // one (opaque underneath) shows through — the two frames overlap. This is
+    // what makes it different from `fade` (incoming only) and `dissolve` (blur).
+    if (effect === 'crossfade' && prevIndex !== activeIndex && image.getAttribute('src') && mediaHost.animate) {
+      const ghost = image.cloneNode(false);
+      ghost.removeAttribute('data-src');
+      ghost.style.cssText = 'position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;object-fit:contain;z-index:3;pointer-events:none;';
+      mediaHost.appendChild(ghost);
+      const fadeOut = ghost.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: 'ease' });
+      const remove = () => ghost.remove();
+      fadeOut.onfinish = remove; fadeOut.oncancel = remove;
+    }
     const source = activeEntry.src;
     image.removeAttribute('srcset');
     image.removeAttribute('sizes');
@@ -304,20 +317,19 @@ function createManager() {
     previous.hidden = !showControls;
     next.hidden = !showControls;
     counter.textContent = showControls ? `${activeIndex + 1} / ${activeList.length}` : '';
-    // Per-item change transition — choose via the `transition` option:
-    // rise (default) · fade/crossfade · dissolve · slide · zoom · none.
-    const fx = activeEntry.transition || 'rise';
-    if (fx !== 'none' && mediaHost.animate) {
+    // Incoming-frame transition. `crossfade` is handled above (overlapping
+    // frames); the rest animate only the new frame:
+    // fade (opacity) · dissolve (opacity+blur) · slide · zoom · rise · none.
+    if (effect !== 'none' && effect !== 'crossfade' && mediaHost.animate) {
       const dir = index < prevIndex ? -1 : 1;
       const frames = {
         fade: [{ opacity: 0 }, { opacity: 1 }],
-        crossfade: [{ opacity: 0 }, { opacity: 1 }],
         dissolve: [{ opacity: 0, filter: 'blur(7px)' }, { opacity: 1, filter: 'blur(0)' }],
         slide: [{ opacity: 0, transform: `translate3d(${dir * 42}px,0,0)` }, { opacity: 1, transform: 'translate3d(0,0,0)' }],
         zoom: [{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'scale(1)' }],
         rise: [{ opacity: 0, transform: 'translate3d(0,10px,0) scale(.985)' }, { opacity: 1, transform: 'translate3d(0,0,0) scale(1)' }]
-      }[fx];
-      if (frames) mediaHost.animate(frames, { duration: fx === 'slide' ? 260 : 200, easing: 'cubic-bezier(.22,.8,.3,1)' });
+      }[effect];
+      if (frames) mediaHost.animate(frames, { duration: effect === 'slide' ? 260 : 200, easing: 'cubic-bezier(.22,.8,.3,1)' });
     }
     applyOptions();
     image.onload = () => {

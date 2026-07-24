@@ -1,8 +1,8 @@
 {
   "$schema": "./kineto.features.schema.json",
   "contractVersion": "1.3.0",
-  "libraryVersion": "0.8.31",
-  "moduleCount": 42,
+  "libraryVersion": "0.8.32",
+  "moduleCount": 43,
   "modules": [
     {
       "name": "ambientMedia",
@@ -1238,9 +1238,11 @@
         "confirm"
       ],
       "publicOptions": [
+        "action",
         "color",
         "duration",
-        "onComplete"
+        "onComplete",
+        "submit"
       ]
     },
     {
@@ -1270,8 +1272,10 @@
       "publicOptions": [
         "dismissible",
         "duration",
+        "max",
         "message",
         "position",
+        "progress",
         "type"
       ]
     },
@@ -1326,6 +1330,26 @@
         "position",
         "radius",
         "step"
+      ]
+    },
+    {
+      "name": "coverReveal",
+      "attribute": "data-kt-cover-reveal",
+      "defaultVariant": "block",
+      "variants": [
+        "block"
+      ],
+      "publicOptions": [
+        "color",
+        "color2",
+        "delay",
+        "direction",
+        "duration",
+        "ease",
+        "layers",
+        "onComplete",
+        "stagger",
+        "threshold"
       ]
     }
   ],

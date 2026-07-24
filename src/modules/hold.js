@@ -27,14 +27,39 @@ export default {
     const setProgress = (p) => { fill.style.transform = `scaleX(${clamp(p, 0, 1)})`; };
     const cancelRaf = () => { if (rafId != null) { cancelAnimationFrame(rafId); rafId = null; } };
 
+    // On confirm, actually perform the action so devs don't have to wire it up:
+    //  1) opts.action / data-kt-hold-action selector → click that element
+    //  2) an <a href> → navigate
+    //  3) a submit button or `submit:true` / data-kt-hold-submit → submit the form
+    // Opt out entirely with submit:false. The event + onComplete always fire too.
+    const runAction = () => {
+      if (opts.submit === false) return;
+      const targetSel = opts.action || el.getAttribute('data-kt-hold-action');
+      if (targetSel) { document.querySelector(targetSel)?.click?.(); return; }
+      if (el.tagName === 'A' && el.getAttribute('href')) { window.location.href = el.href; return; }
+      const form = el.closest?.('form');
+      const wantsSubmit = opts.submit === true || el.type === 'submit' || el.getAttribute('data-kt-hold-submit') != null;
+      if (form && wantsSubmit) {
+        if (typeof form.requestSubmit === 'function') form.requestSubmit(el.type === 'submit' ? el : undefined);
+        else form.submit();
+      }
+    };
+
     const tick = (time) => {
       const p = clamp((time - startTime) / duration, 0, 1);
       setProgress(p);
       if (p >= 1) {
         confirmed = true; holding = false; rafId = null;
         el.classList.add('kt-hold-confirmed');
-        try { el.dispatchEvent(new CustomEvent('kt-hold-confirm', { bubbles: true })); } catch (_error) { /* older */ }
+        el.setAttribute('aria-pressed', 'true');
+        // Cancelable event: preventDefault() in a listener skips the auto action.
+        let proceed = true;
+        try {
+          const ev = new CustomEvent('kt-hold-confirm', { bubbles: true, cancelable: true });
+          proceed = el.dispatchEvent(ev);
+        } catch (_error) { /* older */ }
         opts.onComplete?.(el);
+        if (proceed) runAction();
         return;
       }
       rafId = requestAnimationFrame(tick);
