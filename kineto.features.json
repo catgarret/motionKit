@@ -1350,7 +1350,8 @@
         "lines",
         "onComplete",
         "stagger",
-        "threshold"
+        "threshold",
+        "waitForImage"
       ]
     }
   ],

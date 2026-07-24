@@ -6852,7 +6852,7 @@ var Ht = {
 			if (f) b();
 			else {
 				let t = getComputedStyle(e), n = e.tagName === "IMG" || t.display.startsWith("inline"), r = document.createElement("div");
-				r.className = "kt-cover-wrap", r.style.cssText = `position:relative;overflow:hidden;display:${n ? "inline-block" : "block"};`, e.parentNode.insertBefore(r, e), r.appendChild(e), _ = r, v = () => {
+				r.className = "kt-cover-wrap", r.style.cssText = `position:relative;overflow:hidden;display:${n ? "inline-block" : "block"};border-radius:${t.borderRadius};`, e.parentNode.insertBefore(r, e), r.appendChild(e), _ = r, v = () => {
 					r.parentNode && (r.parentNode.insertBefore(e, r), r.remove());
 				}, y(r);
 			}
@@ -6888,13 +6888,23 @@ var Ht = {
 				m.push(setTimeout(() => {
 					g.forEach((e) => e.panels.forEach((e) => e.remove())), t.onComplete?.(e);
 				}, r));
+			}, w = t.waitForImage !== !1, T = f ? null : e.tagName === "IMG" ? e : e.querySelector && e.querySelector("img"), E = () => {
+				if (w && T && !(T.complete && T.naturalWidth)) {
+					let e = !1, t = () => {
+						e || (e = !0, C());
+					};
+					try {
+						T.decode && T.decode().then(t, t);
+					} catch {}
+					T.addEventListener("load", t, { once: !0 }), T.addEventListener("error", t, { once: !0 }), setTimeout(t, 4e3);
+				} else C();
 			};
 			return n ? g.forEach((e) => e.panels.forEach((e) => e.remove())) : typeof IntersectionObserver < "u" ? (S = new IntersectionObserver((e) => {
 				for (let t of e) if (t.isIntersecting) {
-					S.disconnect(), S = null, C();
+					S.disconnect(), S = null, E();
 					break;
 				}
-			}, { threshold: h(Number(t.threshold ?? .2), 0, 1) }), S.observe(_)) : C(), {
+			}, { threshold: h(Number(t.threshold ?? .2), 0, 1) }), S.observe(_)) : E(), {
 				el: e,
 				type: "coverReveal",
 				replay() {

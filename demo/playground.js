@@ -218,7 +218,7 @@ counter: {
     bottomSheet: ['backdrop','backdropOpacity','dismissible','duration','handle','trigger'],
     tabs: ['activation','duration','effect','indicator','orientation'],
     radial: ['activeAngle','autoplay','controls','drag','duration','loop','position','radius','step'],
-    coverReveal: ['color','color2','delay','direction','duration','ease','layers','lines','onComplete','stagger','threshold']
+    coverReveal: ['color','color2','delay','direction','duration','ease','layers','lines','onComplete','stagger','threshold','waitForImage']
   });
   Object.assign(FIELDS, {
     confetti: [['count','Count','range',10,300,5],['spread','Spread','range',10,180,2],['gravity','Gravity','range',0,3,0.05],['scalar','Scale','range',0.4,3,0.05],['duration','Duration (s)','range',0.5,4,0.1],['colors','Colors (comma)','text'],['trigger','Trigger','select',['click','view','auto']],['zIndex','z-index','range',1000,20000,500]],
@@ -229,7 +229,7 @@ counter: {
     bottomSheet: [['backdrop','Backdrop','checkbox'],['backdropOpacity','Backdrop opacity','range',0,1,0.05],['dismissible','Dismissible','checkbox'],['handle','Drag handle','checkbox'],['duration','Duration (s)','range',0.1,0.8,0.02]],
     tabs: [['activation','Activation','select',['automatic','manual']],['orientation','Orientation','select',['horizontal','vertical']],['effect','Panel effect','select',['fade','slide','none']],['indicator','Indicator','checkbox'],['duration','Duration (s)','range',0,0.6,0.02]],
     radial: [['position','Dock','select',['bottom','top','left','right']],['radius','Radius','range',80,900,10],['step','Angle step','range',6,60,1],['activeAngle','Active angle','range',-180,180,5],['duration','Duration (s)','range',0,1.5,0.05],['loop','Loop','checkbox'],['drag','Drag','checkbox'],['controls','Controls','checkbox'],['autoplay','Autoplay (ms)','range',0,6000,250]],
-    coverReveal: [['lines','Per-line (text)','checkbox'],['color','Panel color','color'],['color2','Panel color 2','color'],['direction','Direction','select',['right','left','up','down']],['duration','Duration (s)','range',0.2,2,0.05],['delay','Delay (ms)','range',0,2000,50],['layers','Layers','range',1,3,1],['stagger','Stagger (ms)','range',0,400,10]]
+    coverReveal: [['lines','Per-line (text)','checkbox'],['color','Panel color','color'],['color2','Panel color 2','color'],['direction','Direction','select',['right','left','up','down']],['duration','Duration (s)','range',0.2,2,0.05],['delay','Delay (ms)','range',0,2000,50],['layers','Layers','range',1,3,1],['stagger','Stagger (ms)','range',0,400,10],['waitForImage','Wait for image','checkbox']]
   });
   Object.assign(DEFAULTS, {
     confetti:{count:140,spread:75,gravity:.9,scalar:1,duration:1.8,trigger:'click'},
@@ -237,6 +237,7 @@ counter: {
     accordion:{single:false,duration:.4,blur:6,arrowPosition:'right'},
     megaMenu:{trigger:'hover',layout:'dropdown',indicator:'none',openDelay:60,closeDelay:180,duration:.24},
     radial:{position:'bottom',radius:260,step:26,activeAngle:-90,duration:.6,loop:true,drag:true,controls:true,autoplay:0},
+    coverReveal:{color:'#ff5b1c',color2:'#12141a',direction:'right',duration:.7,delay:0,layers:2,stagger:120,lines:false,waitForImage:true},
     toast:{type:'info',position:'bottom-right',duration:3200,dismissible:true},
     bottomSheet:{backdrop:true,backdropOpacity:.5,dismissible:true,handle:true,duration:.34},
     tabs:{activation:'automatic',orientation:'horizontal',effect:'fade',indicator:true,duration:.28}

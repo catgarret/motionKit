@@ -59,7 +59,9 @@ export default {
       const inline = el.tagName === 'IMG' || cs.display.startsWith('inline');
       const wrap = document.createElement('div');
       wrap.className = 'kt-cover-wrap';
-      wrap.style.cssText = `position:relative;overflow:hidden;display:${inline ? 'inline-block' : 'block'};`;
+      // Inherit the element's rounding so the panels are clipped to the same
+      // shape (otherwise their square corners poke outside a rounded element).
+      wrap.style.cssText = `position:relative;overflow:hidden;display:${inline ? 'inline-block' : 'block'};border-radius:${cs.borderRadius};`;
       el.parentNode.insertBefore(wrap, el);
       wrap.appendChild(el);
       observeTarget = wrap;
@@ -121,16 +123,34 @@ export default {
       }, total));
     };
 
+    // Load-aware: if this wraps an <img> that isn't decoded yet, hold the sweep
+    // until it loads so the reveal never uncovers a blank frame. `waitForImage`
+    // (default true) turns it off. Text (lines) mode never waits.
+    const waitForImage = opts.waitForImage !== false;
+    const img = !linesMode ? (el.tagName === 'IMG' ? el : (el.querySelector && el.querySelector('img'))) : null;
+    const startPlay = () => {
+      if (waitForImage && img && !(img.complete && img.naturalWidth)) {
+        let fired = false;
+        const kick = () => { if (fired) return; fired = true; play(); };
+        try { if (img.decode) img.decode().then(kick, kick); } catch (_e) { /* ignore */ }
+        img.addEventListener('load', kick, { once: true });
+        img.addEventListener('error', kick, { once: true });
+        setTimeout(kick, 4000); // safety: never hang
+      } else {
+        play();
+      }
+    };
+
     if (reduce) {
       // Instantly visible — remove any panels.
       covers.forEach((cover) => cover.panels.forEach((panel) => panel.remove()));
     } else if (typeof IntersectionObserver !== 'undefined') {
       io = new IntersectionObserver((records) => {
-        for (const record of records) { if (record.isIntersecting) { io.disconnect(); io = null; play(); break; } }
+        for (const record of records) { if (record.isIntersecting) { io.disconnect(); io = null; startPlay(); break; } }
       }, { threshold: clamp(Number(opts.threshold ?? 0.2), 0, 1) });
       io.observe(observeTarget);
     } else {
-      play();
+      startPlay();
     }
 
     return {
