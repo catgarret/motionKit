@@ -2,6 +2,16 @@
 
 Kineto follows Semantic Versioning. Public scope is additionally governed by `FEATURE_CONTRACT.md`.
 
+## [0.8.33]
+
+- **Radial carousel**: prev/next now advance on a single click (the pointer-capture that stole clicks is gone), wrap-around items jump instantly instead of sweeping across the arc, and the `left`/`right` dock focal angles are corrected (items were landing off-screen).
+- **Cover reveal**: load-aware — when wrapping an `<img>` that isn't decoded yet it waits for load before sweeping (`waitForImage`, default on), so it never uncovers a blank frame; inherits the element's `border-radius` so panels clip to rounded corners; text (`lines`) mode split fixed to real rendered lines with sequential per-line reveal and 2-layer support.
+- **Mega-menu**: the open/close indicator is now a clean SVG chevron (was a crude CSS border caret); ↑/↓ move between links in an open panel.
+- **Accordion (demo)**: header padding moved onto `<summary>` so the whole header row toggles, not just the text.
+- **Toast**: progress-bar default colour is the key orange (not the green type accent); demo button no longer squished.
+- **Cursor (demo)**: inner dot grows on hover (instead of scaling the outer ring); thinner, slightly translucent ring; inverts over content via `mix-blend-mode`.
+- **Demo**: hero no longer drifts with the pointer.
+
 ## [0.8.32]
 
 - **New module `data-kt-cover-reveal` (42 → 43)**: one or two coloured panels cover an element and sweep away when it scrolls into view — a block/curtain reveal. Options: `color`, `color2`, `direction`, `duration`, `delay`, `ease`, `layers` (1–3), `stagger`, `threshold`.

@@ -216,11 +216,13 @@ html.kt-preload [data-kt-text-transition] {
 .kt-menu .kt-menu-mega > .kt-menu-panel { left: 0; right: 0; width: 100%; }
 /* Optional indicator icons — state hook is the trigger's aria-expanded. */
 .kt-menu--ind-chevron .kt-menu-trigger::after {
-  content: ""; width: .5em; height: .5em; margin-left: 2px;
-  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
-  transform: rotate(45deg); transition: transform .25s cubic-bezier(.22,.8,.3,1);
+  content: ""; flex: 0 0 auto; width: .9em; height: .9em; margin-left: 4px;
+  background: currentColor; opacity: .6;
+  transition: transform .25s cubic-bezier(.22,.8,.3,1), opacity .25s ease;
+  -webkit-mask: no-repeat center / 100% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+          mask: no-repeat center / 100% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
-.kt-menu--ind-chevron .kt-menu-trigger[aria-expanded="true"]::after { transform: rotate(-135deg); }
+.kt-menu--ind-chevron .kt-menu-trigger[aria-expanded="true"]::after { transform: rotate(180deg); opacity: .9; }
 .kt-menu--ind-plus .kt-menu-trigger::after {
   content: "+"; margin-left: 4px; font-weight: 700; line-height: 1;
   transition: transform .25s cubic-bezier(.22,.8,.3,1);
