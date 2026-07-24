@@ -2,6 +2,13 @@
 
 Kineto follows Semantic Versioning. Public scope is additionally governed by `FEATURE_CONTRACT.md`.
 
+## [0.8.29]
+
+- **New module `data-kt-mega-menu` (37 → 38)** — accessible GNB / mega-menu navigation. Hover-to-open dropdowns (Korean GNB style) or full-width mega panels (`layout:"mega"`), one open at a time. Progressive enhancement over a plain nested `<ul>`; full keyboard support (Enter/Space/↓ open, Esc close & return focus, ←/→ move between top items), automatic `aria-haspopup` / `aria-expanded` / `aria-controls`, outside-click & Esc to close, `openDelay` / `closeDelay` / `duration` / `trigger`.
+- **Confetti — `trigger:"view"`**: fires once when the element scrolls into view, for success / completion screens where the burst should go off in the background on arrival. Colours, count, gravity, spread, and scalar remain fully customizable (e.g. a monochrome dark-mode palette).
+- **Accordion — CSS theming hooks**: the open item now gets a `.kt-open` class and the trigger a `.kt-accordion-summary` class. A default rotating chevron ships in the stylesheet, themeable via `--kt-accordion-arrow`, `--kt-accordion-arrow-size`, `--kt-accordion-arrow-weight`, `--kt-accordion-arrow-duration`, or replaceable by restyling `.kt-accordion-summary::after`.
+- **Demo — section re-categorization**: added a dedicated **Components** section (11) for disclosure / navigation UI; Accordion moved there out of "Content Entrance", Mega-menu added. Confetti and Hold cards now expose their options; corrected the stale "34 modules" labels to 38.
+
 ## [0.8.28]
 
 - **3 new modules (34 → 37)** — filling gaps benchmarked against Motion UI / Toss, all attribute-driven, a11y-aware, progressively enhanced:

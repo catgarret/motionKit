@@ -1,8 +1,8 @@
 {
   "$schema": "./kineto.features.schema.json",
   "contractVersion": "1.3.0",
-  "libraryVersion": "0.8.28",
-  "moduleCount": 37,
+  "libraryVersion": "0.8.29",
+  "moduleCount": 38,
   "modules": [
     {
       "name": "ambientMedia",
@@ -1239,6 +1239,22 @@
         "color",
         "duration",
         "onComplete"
+      ]
+    },
+    {
+      "name": "megaMenu",
+      "attribute": "data-kt-mega-menu",
+      "defaultVariant": "dropdown",
+      "variants": [
+        "dropdown",
+        "mega"
+      ],
+      "publicOptions": [
+        "closeDelay",
+        "duration",
+        "layout",
+        "openDelay",
+        "trigger"
       ]
     }
   ],

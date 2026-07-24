@@ -37,6 +37,7 @@ import fullpageModule from './modules/fullpage.js';
 import confettiModule from './modules/confetti.js';
 import accordionModule from './modules/accordion.js';
 import holdModule from './modules/hold.js';
+import megaMenuModule from './modules/megaMenu.js';
 
 const moduleEntries = {
   parallax: parallaxModule,
@@ -75,7 +76,8 @@ const moduleEntries = {
   fullpage: fullpageModule,
   confetti: confettiModule,
   accordion: accordionModule,
-  hold: holdModule
+  hold: holdModule,
+  megaMenu: megaMenuModule
 };
 
 Object.entries(moduleEntries).forEach(([name, module]) => Kineto.register(name, module));
@@ -119,6 +121,7 @@ export const fullpage = call('fullpage');
 export const confetti = call('confetti');
 export const accordion = call('accordion');
 export const hold = call('hold');
+export const megaMenu = call('megaMenu');
 
 export { moduleEntries as modules };
 export default Kineto;

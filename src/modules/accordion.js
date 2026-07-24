@@ -23,11 +23,17 @@ export default {
       panel.style.overflow = 'hidden';
       Array.from(details.childNodes).forEach((node) => { if (node !== summary) panel.appendChild(node); });
       details.appendChild(panel);
+      // Styling hooks: `.kt-accordion-summary` on the trigger and `.kt-open` on an
+      // open item, so the arrow / colours / effects can be themed purely in CSS
+      // (see the default chevron in kineto.css, override via CSS vars or selectors).
+      summary.classList.add('kt-accordion-summary');
+      if (details.open) details.classList.add('kt-open');
       let anim = null;
       const stop = () => { if (anim) { anim.cancel(); anim = null; } };
       const openIt = () => {
         stop();
         details.open = true;
+        details.classList.add('kt-open');
         const target = panel.scrollHeight;
         anim = panel.animate(
           [{ height: '0px', opacity: 0, filter: `blur(${blur}px)` }, { height: `${target}px`, opacity: 1, filter: 'blur(0px)' }],
@@ -37,6 +43,7 @@ export default {
       };
       const closeIt = () => {
         stop();
+        details.classList.remove('kt-open'); // arrow rotates back during the close
         const start = panel.scrollHeight;
         anim = panel.animate(
           [{ height: `${start}px`, opacity: 1, filter: 'blur(0px)' }, { height: '0px', opacity: 0, filter: `blur(${blur}px)` }],
@@ -57,6 +64,8 @@ export default {
         destroy() {
           stop();
           summary.removeEventListener('click', onClick);
+          summary.classList.remove('kt-accordion-summary');
+          details.classList.remove('kt-open');
           Array.from(panel.childNodes).forEach((node) => details.insertBefore(node, panel));
           panel.remove();
         }

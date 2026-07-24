@@ -91,9 +91,21 @@ export default {
       if (rafId == null) { lastTime = 0; rafId = requestAnimationFrame(tick); }
     };
 
+    // `trigger:"view"` fires once the element scrolls into view — ideal for a
+    // success / completion screen where the burst should go off in the
+    // background on arrival rather than on a click.
+    let io = null;
     const onClick = (event) => fire(event.clientX, event.clientY);
     if (trigger === 'click') el.addEventListener('click', onClick);
     else if (trigger === 'auto') fire();
+    else if (trigger === 'view' && typeof IntersectionObserver !== 'undefined') {
+      io = new IntersectionObserver((records) => {
+        for (const record of records) {
+          if (record.isIntersecting) { fire(); io.disconnect(); io = null; break; }
+        }
+      }, { threshold: 0.35 });
+      io.observe(el);
+    }
 
     return {
       el,
@@ -104,6 +116,7 @@ export default {
       resume() {},
       destroy() {
         if (trigger === 'click') el.removeEventListener('click', onClick);
+        if (io) { io.disconnect(); io = null; }
         if (rafId != null) cancelAnimationFrame(rafId);
         rafId = null;
         canvas?.remove();

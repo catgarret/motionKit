@@ -371,7 +371,7 @@ function oe() {
 	e.id = "kineto-inline-fallback", e.textContent = "\n    @property --kt-angle { syntax: \"<angle>\"; initial-value: 0deg; inherits: false; }\n    @keyframes kt-border-spin { to { --kt-angle: 360deg; } }\n    @keyframes kt-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }\n    @keyframes kt-aurora { to { transform: rotate(360deg); } }\n    @keyframes kt-aurora-drift { 0% { transform: translate3d(-3%,-2%,0) scale(1.06); } 100% { transform: translate3d(3%,2%,0) scale(1.12); } }\n    @keyframes kt-caret { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }\n    .kt-cursor-active, .kt-cursor-active * { cursor: none !important; }\n    .kt-cursor-scope, .kt-cursor-scope * { cursor: none !important; }\n    .kt-tw-caret { animation: kt-caret .8s step-end infinite; }\n    .kt-slide { position: relative; flex: 0 0 100%; min-width: 0; }\n    .kt-slider-wrap { position: relative; overflow: hidden; }\n    @media (prefers-reduced-motion: reduce) {\n      [data-kt-reveal], [data-kt-text-split], [data-kt-blur-text] { opacity: 1 !important; transform: none !important; filter: none !important; }\n    }\n  ", document.head.appendChild(e);
 }
 var Z = {
-	version: "0.8.28",
+	version: "0.8.29",
 	get env() {
 		return G ||= d(), G;
 	},
@@ -6172,8 +6172,13 @@ var Ht = {
 					});
 				}
 				g ??= (_ = 0, requestAnimationFrame(y));
-			}, x = (e) => b(e.clientX, e.clientY);
-			return r === "click" ? e.addEventListener("click", x) : r === "auto" && b(), {
+			}, x = null, S = (e) => b(e.clientX, e.clientY);
+			return r === "click" ? e.addEventListener("click", S) : r === "auto" ? b() : r === "view" && typeof IntersectionObserver < "u" && (x = new IntersectionObserver((e) => {
+				for (let t of e) if (t.isIntersecting) {
+					b(), x.disconnect(), x = null;
+					break;
+				}
+			}, { threshold: .35 }), x.observe(e)), {
 				el: e,
 				type: "confetti",
 				fire: (e, t) => b(e, t),
@@ -6181,7 +6186,7 @@ var Ht = {
 				pause() {},
 				resume() {},
 				destroy() {
-					r === "click" && e.removeEventListener("click", x), g != null && cancelAnimationFrame(g), g = null, f?.remove(), f = null, m = [];
+					r === "click" && e.removeEventListener("click", S), x &&= (x.disconnect(), null), g != null && cancelAnimationFrame(g), g = null, f?.remove(), f = null, m = [];
 				}
 			};
 		},
@@ -6207,11 +6212,11 @@ var Ht = {
 				let n = document.createElement("div");
 				n.className = "kt-accordion-panel", n.style.overflow = "hidden", Array.from(e.childNodes).forEach((e) => {
 					e !== t && n.appendChild(e);
-				}), e.appendChild(n);
+				}), e.appendChild(n), t.classList.add("kt-accordion-summary"), e.open && e.classList.add("kt-open");
 				let c = null, l = () => {
 					c &&= (c.cancel(), null);
 				}, u = () => {
-					l(), e.open = !0;
+					l(), e.open = !0, e.classList.add("kt-open");
 					let t = n.scrollHeight;
 					c = n.animate([{
 						height: "0px",
@@ -6228,7 +6233,7 @@ var Ht = {
 						n.style.height = "", c = null;
 					};
 				}, d = () => {
-					l();
+					l(), e.classList.remove("kt-open");
 					let t = n.scrollHeight;
 					c = n.animate([{
 						height: `${t}px`,
@@ -6257,7 +6262,7 @@ var Ht = {
 					details: e,
 					closeIt: d,
 					destroy() {
-						l(), t.removeEventListener("click", f), Array.from(n.childNodes).forEach((t) => e.insertBefore(t, n)), n.remove();
+						l(), t.removeEventListener("click", f), t.classList.remove("kt-accordion-summary"), e.classList.remove("kt-open"), Array.from(n.childNodes).forEach((t) => e.insertBefore(t, n)), n.remove();
 					}
 				};
 			};
@@ -6327,9 +6332,100 @@ var Ht = {
 				u(), e.removeEventListener("pointerdown", m), e.removeEventListener("pointerup", p), e.removeEventListener("pointerleave", p), e.removeEventListener("pointercancel", p), e.removeEventListener("keydown", g), e.removeEventListener("keyup", _), i.remove();
 			}
 		};
-	} }
+	} },
+	megaMenu: {
+		create(e, t = {}) {
+			let n = Array.from(e.querySelectorAll("li")).filter((e) => e.querySelector(":scope > .kt-menu-panel"));
+			if (!n.length) return null;
+			let r = d().reducedMotion, i = typeof matchMedia < "u" && matchMedia("(hover:hover) and (pointer:fine)").matches, a = t.trigger === "click" ? "click" : "hover", o = t.layout === "mega" ? "mega" : "dropdown", s = Math.max(0, Number(t.openDelay ?? 60)), c = Math.max(0, Number(t.closeDelay ?? 180)), l = Math.max(.05, Number(t.duration ?? .24));
+			e.classList.add("kt-menu", o === "mega" ? "kt-menu--mega" : "kt-menu--dropdown");
+			let u = (e) => Array.from(e.querySelectorAll("a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex=\"-1\"])")), f = [], p = null, m = null, h = null, g = 0, _ = (e) => {
+				clearTimeout(h), p !== e && (p && v(p, !0), p = e, e.li.classList.add("kt-open"), e.trg.setAttribute("aria-expanded", "true"), e.panel.hidden = !1, e.anim &&= (e.anim.cancel(), null), r || (e.anim = e.panel.animate([{
+					opacity: 0,
+					transform: "translateY(-6px)"
+				}, {
+					opacity: 1,
+					transform: "translateY(0)"
+				}], {
+					duration: l * 1e3,
+					easing: "cubic-bezier(.22,.8,.3,1)"
+				})));
+			}, v = (e, t) => {
+				if (!e) return;
+				e.li.classList.remove("kt-open"), e.trg.setAttribute("aria-expanded", "false");
+				let n = () => {
+					e.panel.hidden = !0, e.anim = null;
+				};
+				e.anim &&= (e.anim.cancel(), null), r || t ? n() : (e.anim = e.panel.animate([{
+					opacity: 1,
+					transform: "translateY(0)"
+				}, {
+					opacity: 0,
+					transform: "translateY(-6px)"
+				}], {
+					duration: l * 700,
+					easing: "ease"
+				}), e.anim.onfinish = n, e.anim.oncancel = n), p === e && (p = null);
+			};
+			if (n.forEach((e) => {
+				let t = e.querySelector(":scope > .kt-menu-panel"), n = e.querySelector("a,button,summary,[role=\"button\"]") || e.firstElementChild;
+				if (!t || !n) return;
+				g += 1, t.id = t.id || `kt-menu-panel-${g}`, t.hidden = !0, n.setAttribute("aria-haspopup", "true"), n.setAttribute("aria-expanded", "false"), n.setAttribute("aria-controls", t.id);
+				let r = {
+					li: e,
+					panel: t,
+					trg: n,
+					anim: null,
+					handlers: {}
+				}, o = () => f.indexOf(r), l = () => {
+					clearTimeout(h), clearTimeout(m), m = setTimeout(() => _(r), s);
+				}, d = () => {
+					clearTimeout(m), clearTimeout(h), h = setTimeout(() => v(r), c);
+				}, y = (e) => {
+					e.preventDefault(), p === r ? v(r) : _(r);
+				}, b = (e) => {
+					e.key === "ArrowDown" || e.key === "Enter" || e.key === " " ? (e.preventDefault(), _(r), u(t)[0]?.focus()) : e.key === "Escape" ? (v(r), n.focus()) : e.key === "ArrowRight" ? (e.preventDefault(), f[(o() + 1) % f.length].trg.focus()) : e.key === "ArrowLeft" && (e.preventDefault(), f[(o() - 1 + f.length) % f.length].trg.focus());
+				}, x = (e) => {
+					e.key === "Escape" && (v(r), n.focus());
+				}, S = (t) => {
+					e.contains(t.relatedTarget) || v(r);
+				};
+				a === "hover" && i && (e.addEventListener("mouseenter", l), e.addEventListener("mouseleave", d)), (a === "click" || !i) && n.addEventListener("click", y), n.addEventListener("keydown", b), t.addEventListener("keydown", x), e.addEventListener("focusout", S), r.handlers = {
+					onEnter: l,
+					onLeave: d,
+					onClick: y,
+					onKey: b,
+					onPanelKey: x,
+					onFocusOut: S
+				}, f.push(r);
+			}), !f.length) return null;
+			let y = (e) => {
+				p && !p.li.contains(e.target) && v(p);
+			}, b = (e) => {
+				if (e.key === "Escape" && p) {
+					let e = p;
+					v(e), e.trg.focus();
+				}
+			};
+			return document.addEventListener("pointerdown", y, !0), document.addEventListener("keydown", b), {
+				el: e,
+				type: "megaMenu",
+				pause() {},
+				resume() {},
+				destroy() {
+					clearTimeout(m), clearTimeout(h), document.removeEventListener("pointerdown", y, !0), document.removeEventListener("keydown", b), e.classList.remove("kt-menu", "kt-menu--mega", "kt-menu--dropdown"), f.forEach((e) => {
+						let t = e.handlers;
+						e.li.removeEventListener("mouseenter", t.onEnter), e.li.removeEventListener("mouseleave", t.onLeave), e.trg.removeEventListener("click", t.onClick), e.trg.removeEventListener("keydown", t.onKey), e.panel.removeEventListener("keydown", t.onPanelKey), e.li.removeEventListener("focusout", t.onFocusOut), e.li.classList.remove("kt-open"), e.panel.hidden = !1, e.trg.removeAttribute("aria-haspopup"), e.trg.removeAttribute("aria-expanded"), e.trg.removeAttribute("aria-controls");
+					});
+				}
+			};
+		},
+		reduced(e, t) {
+			return this.create(e, t);
+		}
+	}
 };
 Object.entries(Ht).forEach(([e, t]) => Z.register(e, t));
-var $ = (e) => (t, n) => Z[e](t, n), Ut = $("parallax"), Wt = $("mouseParallax"), Gt = $("reveal"), Kt = $("counter"), qt = $("lazy"), Jt = $("textSplit"), Yt = $("blurText"), Xt = $("shuffle"), Zt = $("typewriter"), Qt = $("textReveal"), $t = $("textTransition"), en = $("magnetic"), tn = $("marquee"), nn = $("overflowText"), rn = $("loader"), an = $("tilt"), on = $("cursor"), sn = $("textFill"), cn = $("stickyStack"), ln = $("scrollVelocity"), un = $("progress"), dn = $("slider"), fn = $("ambientMedia"), pn = $("pageReveal"), mn = $("glitch"), hn = $("cardGlow"), gn = $("lightbox"), _n = $("pageTransition"), vn = $("vibrate"), yn = $("ripple"), bn = $("cssScroll"), xn = $("scrollSequence"), Sn = $("brushReveal"), Cn = $("fullpage"), wn = $("confetti"), Tn = $("accordion"), En = $("hold"), Dn = Z;
+var $ = (e) => (t, n) => Z[e](t, n), Ut = $("parallax"), Wt = $("mouseParallax"), Gt = $("reveal"), Kt = $("counter"), qt = $("lazy"), Jt = $("textSplit"), Yt = $("blurText"), Xt = $("shuffle"), Zt = $("typewriter"), Qt = $("textReveal"), $t = $("textTransition"), en = $("magnetic"), tn = $("marquee"), nn = $("overflowText"), rn = $("loader"), an = $("tilt"), on = $("cursor"), sn = $("textFill"), cn = $("stickyStack"), ln = $("scrollVelocity"), un = $("progress"), dn = $("slider"), fn = $("ambientMedia"), pn = $("pageReveal"), mn = $("glitch"), hn = $("cardGlow"), gn = $("lightbox"), _n = $("pageTransition"), vn = $("vibrate"), yn = $("ripple"), bn = $("cssScroll"), xn = $("scrollSequence"), Sn = $("brushReveal"), Cn = $("fullpage"), wn = $("confetti"), Tn = $("accordion"), En = $("hold"), Dn = $("megaMenu"), On = Z;
 //#endregion
-export { Tn as accordion, fn as ambientMedia, Yt as blurText, Sn as brushReveal, hn as cardGlow, wn as confetti, Kt as counter, bn as cssScroll, on as cursor, Dn as default, Cn as fullpage, mn as glitch, En as hold, qt as lazy, gn as lightbox, rn as loader, en as magnetic, tn as marquee, Ht as modules, Wt as mouseParallax, nn as overflowText, pn as pageReveal, _n as pageTransition, Ut as parallax, un as progress, Gt as reveal, yn as ripple, xn as scrollSequence, ln as scrollVelocity, Xt as shuffle, dn as slider, cn as stickyStack, sn as textFill, Qt as textReveal, Jt as textSplit, $t as textTransition, an as tilt, Zt as typewriter, vn as vibrate };
+export { Tn as accordion, fn as ambientMedia, Yt as blurText, Sn as brushReveal, hn as cardGlow, wn as confetti, Kt as counter, bn as cssScroll, on as cursor, On as default, Cn as fullpage, mn as glitch, En as hold, qt as lazy, gn as lightbox, rn as loader, en as magnetic, tn as marquee, Dn as megaMenu, Ht as modules, Wt as mouseParallax, nn as overflowText, pn as pageReveal, _n as pageTransition, Ut as parallax, un as progress, Gt as reveal, yn as ripple, xn as scrollSequence, ln as scrollVelocity, Xt as shuffle, dn as slider, cn as stickyStack, sn as textFill, Qt as textReveal, Jt as textSplit, $t as textTransition, an as tilt, Zt as typewriter, vn as vibrate };

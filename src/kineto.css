@@ -145,3 +145,60 @@ html.kt-preload [data-kt-shuffle],
 html.kt-preload [data-kt-text-transition] {
   visibility: hidden !important;
 }
+
+/* ── Accordion ──────────────────────────────────────────────────────────────
+   Default chevron + open-state hooks for `data-kt-accordion`. Everything is
+   themeable with CSS variables (or override the selectors outright):
+     --kt-accordion-arrow            arrow colour        (default currentColor)
+     --kt-accordion-arrow-size       arrow size          (default .6em)
+     --kt-accordion-arrow-weight     arrow line weight   (default 2px)
+     --kt-accordion-arrow-duration   rotate duration     (default .3s)
+   `.kt-open` is added to the open <details>; `.kt-accordion-summary` to the
+   trigger. To use your own icon, just restyle `.kt-accordion-summary::after`. */
+[data-kt-accordion] .kt-accordion-summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+}
+[data-kt-accordion] .kt-accordion-summary::-webkit-details-marker { display: none; }
+[data-kt-accordion] .kt-accordion-summary::after {
+  content: "";
+  flex: 0 0 auto;
+  width: var(--kt-accordion-arrow-size, .6em);
+  height: var(--kt-accordion-arrow-size, .6em);
+  border-right: var(--kt-accordion-arrow-weight, 2px) solid var(--kt-accordion-arrow, currentColor);
+  border-bottom: var(--kt-accordion-arrow-weight, 2px) solid var(--kt-accordion-arrow, currentColor);
+  transform: rotate(45deg);
+  transition: transform var(--kt-accordion-arrow-duration, .3s) cubic-bezier(.22,.8,.3,1);
+  opacity: .65;
+}
+[data-kt-accordion] .kt-open > .kt-accordion-summary::after { transform: rotate(-135deg); }
+@media (prefers-reduced-motion: reduce) {
+  [data-kt-accordion] .kt-accordion-summary::after { transition: none; }
+}
+
+/* ── Mega-menu / GNB ─────────────────────────────────────────────────────────
+   Structural defaults for `data-kt-mega-menu`. Colours/spacing are left to the
+   host site — only positioning + the show/hide contract live here.
+   `.kt-open` marks the open <li>; `.kt-menu--mega` panels span full width. */
+[data-kt-mega-menu] .kt-menu-panel[hidden] { display: none; }
+.kt-menu--dropdown > ul > li,
+.kt-menu > ul > li { position: relative; }
+.kt-menu--dropdown .kt-menu-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 50;
+}
+.kt-menu--mega { position: relative; }
+.kt-menu--mega .kt-menu-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 50;
+}
