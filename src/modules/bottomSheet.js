@@ -62,7 +62,9 @@ export default {
       open = false;
       el.classList.remove('kt-open');
       document.removeEventListener('keydown', onKey, true);
-      const finish = () => { el.hidden = true; if (backdrop) backdrop.hidden = true; };
+      // Guard on `open`: if the sheet is reopened before this close animation
+      // finishes (or is cancelled by the reopen), do NOT hide it.
+      const finish = () => { if (!open) { el.hidden = true; if (backdrop) backdrop.hidden = true; } };
       if (backdrop && !reduce) backdrop.animate([{ opacity: 1 }, { opacity: 0 }], { duration: duration * 800, easing: 'ease' });
       if (reduce) finish();
       else { if (anim) anim.cancel(); anim = el.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(100%)' }], { duration: duration * 800, easing: 'ease' }); anim.onfinish = finish; anim.oncancel = finish; }

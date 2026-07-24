@@ -43,7 +43,7 @@ textSplit(data-kt-text-split), textTransition(data-kt-text-transition), tilt(dat
 typewriter(data-kt-typewriter), vibrate(data-kt-vibrate),
 accordion(data-kt-accordion), confetti(data-kt-confetti), hold(data-kt-hold),
 megaMenu(data-kt-mega-menu), tabs(data-kt-tabs), toast(data-kt-toast),
-bottomSheet(data-kt-bottom-sheet)
+bottomSheet(data-kt-bottom-sheet), radial(data-kt-radial)
 ```
 
 ### English
@@ -74,7 +74,7 @@ textSplit(data-kt-text-split), textTransition(data-kt-text-transition), tilt(dat
 typewriter(data-kt-typewriter), vibrate(data-kt-vibrate),
 accordion(data-kt-accordion), confetti(data-kt-confetti), hold(data-kt-hold),
 megaMenu(data-kt-mega-menu), tabs(data-kt-tabs), toast(data-kt-toast),
-bottomSheet(data-kt-bottom-sheet)
+bottomSheet(data-kt-bottom-sheet), radial(data-kt-radial)
 ```
 
 ---
@@ -136,13 +136,16 @@ bottomSheet(data-kt-bottom-sheet)
 | GNB 드롭다운·메가메뉴(키보드/aria) | `megaMenu` (`data-kt-mega-menu`) |
 | 탭 UI(WAI-ARIA/KRDS, 키보드) | `tabs` (`data-kt-tabs`) |
 | 바텀시트(드래그·포커스 트랩) | `bottomSheet` (`data-kt-bottom-sheet`) |
+| 원형 회전 캐러셀(하단/측면 도킹) | `radial` (`data-kt-radial`) |
 
 ### UI 컴포넌트 커스터마이징 요령
 - 모든 예제는 데모 페이지에서 옵션을 실시간으로 조절하고 **HTML/JS 코드를 복사**할 수 있습니다(“Customize & copy code”).
 - `confetti`: `colors`(쉼표 구분), `count`, `gravity`, `spread`, `scalar`, `duration`, `trigger`(click/view/auto). 다크모드는 흑백 팔레트를 `colors`로 전달.
 - `hold`: `duration`(ms), `color`(채움색), 완료 시 `kt-hold-confirm` 이벤트 + `onComplete`.
 - `accordion`: `single`, `duration`, `blur`, `arrowPosition`(right/left). 화살표는 CSS 변수 `--kt-accordion-arrow`, `--kt-accordion-arrow-size`, `--kt-accordion-arrow-weight`, `--kt-accordion-arrow-duration`로, 또는 `.kt-accordion-summary::after` 재정의로 커스텀.
-- `megaMenu`: `trigger`(hover/click), `layout`(dropdown/mega), `openDelay`, `closeDelay`, `duration`. `<li class="kt-menu-mega">`로 개별 항목만 풀폭 메가로.
+- `megaMenu`: `trigger`(hover/click), `layout`(dropdown/mega), `indicator`(none/chevron/plus), `openDelay`, `closeDelay`, `duration`. 항목별로 `<li data-kt-menu-trigger="click">`로 트리거 혼용, `<li class="kt-menu-mega">`로 개별 항목만 풀폭 메가로, `<li data-kt-menu-open="#선택자">`로 특정 영역 hover 시 열기. 패널 링크는 기본 스타일 제공(색은 `--kt-menu-accent`, `--kt-menu-hover-bg`).
+- `radial`: `position`(bottom/top/left/right 도킹), `radius`, `step`(항목 간 각도), `activeAngle`(초점 각도), `duration`, `loop`, `drag`, `controls`, `autoplay`. 항목은 `.kt-radial-item`. 컨테이너 높이/썸네일 스타일은 호스트가 지정.
+- `lightbox`: 이미지 전환 효과 `transition`(rise/fade/crossfade/dissolve/slide/zoom/none) 추가.
 - `toast`: `type`(info/success/warning/error), `position`, `duration`, `dismissible`, `message`. 색은 `--kt-toast-bg/-fg/-accent`.
 - `bottomSheet`: `backdrop`, `backdropOpacity`, `handle`, `dismissible`, `duration`. 트리거는 `data-kt-sheet-trigger="#시트id"`.
 - `tabs`: `activation`(automatic/manual), `orientation`(horizontal/vertical), `effect`(fade/slide/none), `indicator`. 색은 `--kt-tab-accent`.

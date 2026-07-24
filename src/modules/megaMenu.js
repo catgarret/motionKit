@@ -29,8 +29,12 @@ export default {
     const openDelay = Math.max(0, Number(opts.openDelay ?? 60));
     const closeDelay = Math.max(0, Number(opts.closeDelay ?? 180));
     const duration = Math.max(0.05, Number(opts.duration ?? 0.24));
+    // Optional open/close indicator icon on each trigger (like an accordion):
+    // 'chevron' rotates, 'plus' turns into ×. State hook = aria-expanded.
+    const indicator = ['chevron', 'plus'].includes(opts.indicator) ? opts.indicator : 'none';
 
     el.classList.add('kt-menu', layout === 'mega' ? 'kt-menu--mega' : 'kt-menu--dropdown');
+    if (indicator !== 'none') el.classList.add(`kt-menu--ind-${indicator}`);
 
     const focusables = (panel) => Array.from(panel.querySelectorAll(
       'a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])'
@@ -87,6 +91,14 @@ export default {
       trg.setAttribute('aria-haspopup', 'true');
       trg.setAttribute('aria-expanded', 'false');
       trg.setAttribute('aria-controls', panel.id);
+      trg.classList.add('kt-menu-trigger');
+      // Per-item trigger override: mix hover mega-menus with click dropdowns.
+      const rawItemTrigger = li.getAttribute('data-kt-menu-trigger');
+      const itemTrigger = rawItemTrigger === 'click' ? 'click' : rawItemTrigger === 'hover' ? 'hover' : trigger;
+      // Optional external hover zone(s): pointing at any element matching this
+      // selector opens THIS item's panel (e.g. hovering a banner opens the mega).
+      const zoneSel = li.getAttribute('data-kt-menu-open');
+      const zones = zoneSel ? Array.from(document.querySelectorAll(zoneSel)) : [];
 
       const entry = { li, panel, trg, anim: null, handlers: {} };
       const index = () => entries.indexOf(entry);
@@ -108,13 +120,15 @@ export default {
       const onPanelKey = (event) => { if (event.key === 'Escape') { doClose(entry); trg.focus(); } };
       const onFocusOut = (event) => { if (!li.contains(event.relatedTarget)) doClose(entry); };
 
-      if (trigger === 'hover' && canHover) { li.addEventListener('mouseenter', onEnter); li.addEventListener('mouseleave', onLeave); }
-      if (trigger === 'click' || !canHover) { trg.addEventListener('click', onClick); }
+      const hoverMode = itemTrigger === 'hover';
+      if (canHover && (hoverMode || zones.length)) { li.addEventListener('mouseenter', onEnter); li.addEventListener('mouseleave', onLeave); }
+      if (!hoverMode || !canHover) { trg.addEventListener('click', onClick); }
+      if (canHover) zones.forEach((z) => { z.addEventListener('mouseenter', onEnter); z.addEventListener('mouseleave', onLeave); });
       trg.addEventListener('keydown', onKey);
       panel.addEventListener('keydown', onPanelKey);
       li.addEventListener('focusout', onFocusOut);
 
-      entry.handlers = { onEnter, onLeave, onClick, onKey, onPanelKey, onFocusOut };
+      entry.handlers = { onEnter, onLeave, onClick, onKey, onPanelKey, onFocusOut, zones };
       entries.push(entry);
     });
 
@@ -136,7 +150,7 @@ export default {
         clearTimeout(closeTimer);
         document.removeEventListener('pointerdown', onDocDown, true);
         document.removeEventListener('keydown', onDocKey);
-        el.classList.remove('kt-menu', 'kt-menu--mega', 'kt-menu--dropdown');
+        el.classList.remove('kt-menu', 'kt-menu--mega', 'kt-menu--dropdown', 'kt-menu--ind-chevron', 'kt-menu--ind-plus');
         entries.forEach((entry) => {
           const h = entry.handlers;
           entry.li.removeEventListener('mouseenter', h.onEnter);
@@ -145,7 +159,9 @@ export default {
           entry.trg.removeEventListener('keydown', h.onKey);
           entry.panel.removeEventListener('keydown', h.onPanelKey);
           entry.li.removeEventListener('focusout', h.onFocusOut);
+          (h.zones || []).forEach((z) => { z.removeEventListener('mouseenter', h.onEnter); z.removeEventListener('mouseleave', h.onLeave); });
           entry.li.classList.remove('kt-open');
+          entry.trg.classList.remove('kt-menu-trigger');
           entry.panel.hidden = false;
           entry.trg.removeAttribute('aria-haspopup');
           entry.trg.removeAttribute('aria-expanded');

@@ -273,6 +273,7 @@ function createManager() {
     if (!activeList.length) return;
     lazyInstance?.destroy?.();
     lazyInstance = null;
+    const prevIndex = activeIndex;
     activeIndex = (index + activeList.length) % activeList.length;
     activeEntry = activeList[activeIndex];
     resetZoom();
@@ -303,11 +304,21 @@ function createManager() {
     previous.hidden = !showControls;
     next.hidden = !showControls;
     counter.textContent = showControls ? `${activeIndex + 1} / ${activeList.length}` : '';
-    // Soft item transition: fade + rise, Toss-style restraint.
-    mediaHost.animate?.([
-      { opacity: 0, transform: 'translate3d(0,10px,0) scale(.985)' },
-      { opacity: 1, transform: 'translate3d(0,0,0) scale(1)' }
-    ], { duration: 170, easing: 'cubic-bezier(.22,.8,.3,1)' });
+    // Per-item change transition — choose via the `transition` option:
+    // rise (default) · fade/crossfade · dissolve · slide · zoom · none.
+    const fx = activeEntry.transition || 'rise';
+    if (fx !== 'none' && mediaHost.animate) {
+      const dir = index < prevIndex ? -1 : 1;
+      const frames = {
+        fade: [{ opacity: 0 }, { opacity: 1 }],
+        crossfade: [{ opacity: 0 }, { opacity: 1 }],
+        dissolve: [{ opacity: 0, filter: 'blur(7px)' }, { opacity: 1, filter: 'blur(0)' }],
+        slide: [{ opacity: 0, transform: `translate3d(${dir * 42}px,0,0)` }, { opacity: 1, transform: 'translate3d(0,0,0)' }],
+        zoom: [{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'scale(1)' }],
+        rise: [{ opacity: 0, transform: 'translate3d(0,10px,0) scale(.985)' }, { opacity: 1, transform: 'translate3d(0,0,0) scale(1)' }]
+      }[fx];
+      if (frames) mediaHost.animate(frames, { duration: fx === 'slide' ? 260 : 200, easing: 'cubic-bezier(.22,.8,.3,1)' });
+    }
     applyOptions();
     image.onload = () => {
       const basic = `${image.naturalWidth || '?'}×${image.naturalHeight || '?'} · ${activeIndex + 1}/${activeList.length}`;
@@ -605,6 +616,7 @@ export default {
       // shares data-kt-duration with another module (e.g. a lazy loader whose
       // long load duration would otherwise bleed into the backdrop fade).
       duration: opts.lightboxDuration ?? opts.duration,
+      transition: opts.transition,
       radius: opts.radius,
       toolbar: opts.toolbar,
       info: opts.info,

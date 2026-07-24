@@ -41,6 +41,7 @@ import megaMenuModule from './modules/megaMenu.js';
 import toastModule from './modules/toast.js';
 import bottomSheetModule from './modules/bottomSheet.js';
 import tabsModule from './modules/tabs.js';
+import radialModule from './modules/radial.js';
 
 const moduleEntries = {
   parallax: parallaxModule,
@@ -83,7 +84,8 @@ const moduleEntries = {
   megaMenu: megaMenuModule,
   toast: toastModule,
   bottomSheet: bottomSheetModule,
-  tabs: tabsModule
+  tabs: tabsModule,
+  radial: radialModule
 };
 
 Object.entries(moduleEntries).forEach(([name, module]) => Kineto.register(name, module));
@@ -131,6 +133,7 @@ export const megaMenu = call('megaMenu');
 export const toast = call('toast');
 export const bottomSheet = call('bottomSheet');
 export const tabs = call('tabs');
+export const radial = call('radial');
 
 export { moduleEntries as modules };
 export default Kineto;

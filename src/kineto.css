@@ -187,19 +187,48 @@ html.kt-preload [data-kt-text-transition] {
 }
 
 /* ── Mega-menu / GNB ─────────────────────────────────────────────────────────
-   Structural defaults for `data-kt-mega-menu`. Colours/spacing are left to the
-   host site — only positioning + the show/hide contract live here.
-   `.kt-open` marks the open <li>. Panels are dropdowns by default; add
-   `.kt-menu-mega` to an <li> (or `layout:"mega"`) for a full-width panel. */
-.kt-menu > ul { position: relative; }
+   Ships tasteful, easily-overridable defaults for `data-kt-mega-menu`:
+   list resets, clean panel links, dropdown/mega positioning, and an optional
+   open/close indicator (chevron / plus). `.kt-open` marks the open <li>;
+   `.kt-menu-trigger` the trigger. Theme with --kt-menu-* variables. */
+.kt-menu > ul { position: relative; list-style: none; margin: 0; padding: 0; }
 .kt-menu > ul > li { position: relative; }
-.kt-menu .kt-menu-panel { position: absolute; top: 100%; left: 0; z-index: 50; }
+.kt-menu-trigger { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.kt-menu .kt-menu-panel { position: absolute; top: 100%; left: 0; z-index: 50; margin-top: 0; }
 .kt-menu .kt-menu-panel[hidden] { display: none; }
-/* Full-width mega panel: anchored to the whole bar, not the item. */
+/* Clean default styling for links inside a panel (no raw blue underline). */
+.kt-menu-panel ul { list-style: none; margin: 0; padding: 0; }
+.kt-menu-panel a {
+  color: inherit; text-decoration: none; display: block;
+  padding: 6px 8px; border-radius: 8px; line-height: 1.4;
+  transition: background var(--kt-menu-hover-duration, .16s) ease, color .16s ease, opacity .16s ease;
+}
+.kt-menu-panel a:hover,
+.kt-menu-panel a:focus-visible {
+  background: var(--kt-menu-hover-bg, color-mix(in srgb, currentColor 10%, transparent));
+  color: var(--kt-menu-hover-color, inherit);
+}
+.kt-menu-panel a:focus-visible { outline: 2px solid var(--kt-menu-accent, currentColor); outline-offset: 1px; }
+/* A mega <li> is a static container so its panel spans the WHOLE bar
+   (the ul), not the narrow item — otherwise the columns collapse & overlap. */
+.kt-menu .kt-menu-mega { position: static; }
 .kt-menu--mega .kt-menu-panel,
 .kt-menu .kt-menu-mega > .kt-menu-panel { left: 0; right: 0; width: 100%; }
-/* Keep panels reachable by the pointer (no gap flicker on hover). */
-.kt-menu .kt-menu-panel { margin-top: 0; }
+/* Optional indicator icons — state hook is the trigger's aria-expanded. */
+.kt-menu--ind-chevron .kt-menu-trigger::after {
+  content: ""; width: .5em; height: .5em; margin-left: 2px;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(45deg); transition: transform .25s cubic-bezier(.22,.8,.3,1);
+}
+.kt-menu--ind-chevron .kt-menu-trigger[aria-expanded="true"]::after { transform: rotate(-135deg); }
+.kt-menu--ind-plus .kt-menu-trigger::after {
+  content: "+"; margin-left: 4px; font-weight: 700; line-height: 1;
+  transition: transform .25s cubic-bezier(.22,.8,.3,1);
+}
+.kt-menu--ind-plus .kt-menu-trigger[aria-expanded="true"]::after { transform: rotate(135deg); }
+@media (prefers-reduced-motion: reduce) {
+  .kt-menu-trigger::after { transition: none; }
+}
 
 /* ── Toast ───────────────────────────────────────────────────────────────────
    Live-region notifications. Themeable via `.kt-toast*` + CSS variables:
@@ -219,9 +248,11 @@ html.kt-preload [data-kt-text-transition] {
   pointer-events: auto; display: flex; align-items: center; gap: 12px;
   padding: 12px 14px; border-radius: var(--kt-toast-radius, 12px);
   background: var(--kt-toast-bg, #1c1f26); color: var(--kt-toast-fg, #f6f7fb);
-  box-shadow: 0 12px 34px rgba(0,0,0,.32); border-left: 3px solid var(--kt-toast-accent, #4aa8ff);
+  box-shadow: 0 12px 34px rgba(0,0,0,.32);
   font-size: 14px; line-height: 1.4; max-width: 100%;
 }
+/* Type accent is opt-in only (add your own border/icon via --kt-toast-accent):
+   no decorative border by default. */
 .kt-toast--success { --kt-toast-accent: #2ec16b; }
 .kt-toast--warning { --kt-toast-accent: #ffb020; }
 .kt-toast--error   { --kt-toast-accent: #ff5a5a; }
@@ -234,9 +265,15 @@ html.kt-preload [data-kt-text-transition] {
 
 /* ── Bottom sheet ─────────────────────────────────────────────────────────────
    Themeable via --kt-sheet-bg, --kt-sheet-radius, --kt-sheet-max. */
+/* Backdrop is fully themeable: colour (--kt-sheet-backdrop-bg), opacity (set by
+   the `backdropOpacity` option or --kt-sheet-backdrop-opacity) and an optional
+   blur (--kt-sheet-backdrop-blur, e.g. blur(6px)). */
 .kt-sheet-backdrop {
   position: fixed; inset: 0; z-index: 11800;
-  background: rgba(0,0,0, var(--kt-sheet-backdrop-opacity, .5));
+  background: var(--kt-sheet-backdrop-bg, #000);
+  opacity: var(--kt-sheet-backdrop-opacity, .5);
+  -webkit-backdrop-filter: var(--kt-sheet-backdrop-blur, none);
+  backdrop-filter: var(--kt-sheet-backdrop-blur, none);
 }
 .kt-sheet {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 11900;
@@ -274,3 +311,28 @@ html.kt-preload [data-kt-text-transition] {
 @media (prefers-reduced-motion: reduce) {
   .kt-tabs__indicator { transition: none; }
 }
+
+/* ── Radial carousel ──────────────────────────────────────────────────────────
+   Wheel of items around a hub docked to an edge (`--${position}`). The host
+   sets the container height/width and item (thumb) styling; the module handles
+   the orbit transforms. Themeable via --kt-radial-radius (also set by the
+   `radius` option). Only the focal arc shows (overflow clipped). */
+.kt-radial { position: relative; overflow: hidden; }
+.kt-radial-hub { position: absolute; width: 0; height: 0; }
+.kt-radial--bottom .kt-radial-hub { left: 50%; top: 100%; }
+.kt-radial--top .kt-radial-hub { left: 50%; top: 0; }
+.kt-radial--left .kt-radial-hub { left: 0; top: 50%; }
+.kt-radial--right .kt-radial-hub { left: 100%; top: 50%; }
+.kt-radial-item { position: absolute; left: 0; top: 0; will-change: transform; }
+.kt-radial-controls { position: absolute; z-index: 200; display: flex; gap: 8px; }
+.kt-radial--bottom .kt-radial-controls, .kt-radial--top .kt-radial-controls { left: 50%; bottom: 12px; transform: translateX(-50%); }
+.kt-radial--left .kt-radial-controls, .kt-radial--right .kt-radial-controls { right: 12px; top: 50%; transform: translateY(-50%); flex-direction: column; }
+.kt-radial-controls button {
+  width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+  border: 1px solid var(--kt-radial-btn-border, rgba(128,128,128,.4));
+  background: var(--kt-radial-btn-bg, rgba(20,20,20,.5)); color: var(--kt-radial-btn-fg, #fff);
+  display: grid; place-items: center;
+}
+.kt-radial-controls .kt-radial-prev::before { content: "‹"; font-size: 22px; line-height: 1; }
+.kt-radial-controls .kt-radial-next::before { content: "›"; font-size: 22px; line-height: 1; }
+.kt-radial:focus-visible { outline: 2px solid var(--kt-radial-accent, #ff5b1c); outline-offset: 3px; }

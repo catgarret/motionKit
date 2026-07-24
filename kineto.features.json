@@ -1,8 +1,8 @@
 {
   "$schema": "./kineto.features.schema.json",
   "contractVersion": "1.3.0",
-  "libraryVersion": "0.8.30",
-  "moduleCount": 41,
+  "libraryVersion": "0.8.31",
+  "moduleCount": 42,
   "modules": [
     {
       "name": "ambientMedia",
@@ -477,6 +477,7 @@
         "src",
         "title",
         "toolbar",
+        "transition",
         "uiTemplate",
         "wheelStep",
         "zoom",
@@ -1253,6 +1254,7 @@
       "publicOptions": [
         "closeDelay",
         "duration",
+        "indicator",
         "layout",
         "openDelay",
         "trigger"
@@ -1302,6 +1304,28 @@
         "effect",
         "indicator",
         "orientation"
+      ]
+    },
+    {
+      "name": "radial",
+      "attribute": "data-kt-radial",
+      "defaultVariant": "bottom",
+      "variants": [
+        "bottom",
+        "top",
+        "left",
+        "right"
+      ],
+      "publicOptions": [
+        "activeAngle",
+        "autoplay",
+        "controls",
+        "drag",
+        "duration",
+        "loop",
+        "position",
+        "radius",
+        "step"
       ]
     }
   ],

@@ -2,6 +2,20 @@
 
 Kineto follows Semantic Versioning. Public scope is additionally governed by `FEATURE_CONTRACT.md`.
 
+## [0.8.31]
+
+- **New module `data-kt-radial` — radial / circular carousel (41 → 42)**: items orbit a hub docked to any edge (`position: bottom | top | left | right`) so only the focal arc shows — the SOL:enchant / 7 Origin wheel, or the old Naver green-dot dial. Rotate via prev/next, click an item, drag, autoplay, or ←/→. Accessible (role=group, aria-current, live region), reduced-motion snaps. Options: `radius`, `step`, `activeAngle`, `position`, `duration`, `loop`, `drag`, `controls`, `autoplay`.
+- **Mega-menu / GNB — real-world options**:
+  - Per-item trigger override: `<li data-kt-menu-trigger="click">` mixes click dropdowns with hover mega-menus in one bar.
+  - Hover zone: `<li data-kt-menu-open="#selector">` opens that item when the pointer enters any matching element (e.g. a banner opens the mega).
+  - `indicator: "chevron" | "plus"` shows an open/close icon on each trigger (state = aria-expanded).
+  - **Fixed the broken mega layout**: a mega `<li>` is now a static container so its panel spans the whole bar (not the narrow item) — the collapsed/overlapping columns are gone.
+  - **Ships clean default styling** for panel links (no raw browser blue/underline), list resets, focus rings — themeable via `--kt-menu-accent` / `--kt-menu-hover-bg`.
+- **Lightbox — `transition` option** for the image change effect: `rise` (default) · `fade` / `crossfade` · `dissolve` · `slide` (direction-aware) · `zoom` · `none`.
+- **Bottom sheet fixes**: reopening after close now works (the close animation's `oncancel` no longer hides a freshly reopened sheet). Backdrop is fully themeable — colour (`--kt-sheet-backdrop-bg`), opacity (`backdropOpacity`), and blur (`--kt-sheet-backdrop-blur`); width via `--kt-sheet-width`.
+- **Toast**: removed the default left accent border (opt-in only now).
+- Playground: radialCarousel, the new megaMenu `indicator`, and the lightbox `transition` are all exposed as live controls with copyable code.
+
 ## [0.8.30]
 
 - **3 new modules (38 → 41)**:
